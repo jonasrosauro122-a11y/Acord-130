@@ -414,8 +414,7 @@ function exportCSV() {
   const logs = getLogs();
   if(!logs.length) { toast('No result logs yet.'); return; }
   const headers = ['date','vaName','vaEmail','scenarioTitle','score','passed','attemptsUsed','criticalMisses','totalMisses'];
-  const csv = [headers.join(',')].concat(logs.map(row => headers.map(h => '"' + String(row[h] ?? '').replace(/"/g,'""') + '"').join(','))).join('
-');
+  const csv = [headers.join(',')].concat(logs.map(row => headers.map(h => '"' + String(row[h] ?? '').replace(/"/g,'""') + '"').join(','))).join('\\n');
   const blob = new Blob([csv], {type:'text/csv'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

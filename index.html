@@ -1,318 +1,825 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ACORD 130 Actual Form Simulator | LAVA Training</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LAVA Commercial ACORD Form Simulator</title>
   <style>
     :root{
-      --bg:#0b1020; --panel:#11182d; --panel2:#151f3a; --text:#f8fafc; --muted:#aeb9d2;
-      --accent:#ff385c; --accent2:#ff9f43; --good:#39e58b; --bad:#ff4d6d; --warn:#ffd166;
-      --line:rgba(255,255,255,.15); --glass:rgba(255,255,255,.08); --shadow:0 24px 80px rgba(0,0,0,.35);
-      --field:transparent; --fieldBorder:transparent; --errorField:rgba(254,202,202,.68); --errorBorder:#ef4444;
+      --bg:#0b1020;
+      --panel:#121a31;
+      --panel2:#17233f;
+      --paper:#ffffff;
+      --ink:#101828;
+      --muted:#667085;
+      --line:#cbd5e1;
+      --brand:#e11d48;
+      --brand2:#fb923c;
+      --good:#16a34a;
+      --bad:#dc2626;
+      --warn:#f59e0b;
+      --blue:#1d4ed8;
+      --glass:rgba(255,255,255,.08);
+      --shadow:0 24px 70px rgba(0,0,0,.35);
+      --radius:22px;
     }
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
-    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at 8% 0%,rgba(255,56,92,.35),transparent 36%),radial-gradient(circle at 80% 10%,rgba(255,159,67,.23),transparent 28%),linear-gradient(135deg,#060913 0%,#0b1020 48%,#1b102d 100%);min-height:100vh}
-    .app{width:min(1640px,96vw);margin:0 auto;padding:26px 0 46px}
-    .glass{background:linear-gradient(180deg,rgba(255,255,255,.105),rgba(255,255,255,.055));border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);backdrop-filter:blur(18px)}
-    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-bottom:18px;align-items:stretch}
-    .hero-main{padding:26px;position:relative;overflow:hidden}
-    .hero-main:after{content:"";position:absolute;width:300px;height:300px;right:-90px;bottom:-110px;background:radial-gradient(circle,rgba(255,56,92,.42),transparent 65%);filter:blur(9px)}
-    .eyebrow{margin:0 0 8px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#ffd6df;font-weight:900}
-    h1{margin:0 0 12px;font-size:clamp(30px,4vw,56px);line-height:.96;letter-spacing:-.045em}
-    .lead{max-width:930px;color:var(--muted);line-height:1.65;font-size:16px;margin:0}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      color:#fff;
+      background:
+        radial-gradient(circle at 10% 4%,rgba(225,29,72,.38),transparent 32%),
+        radial-gradient(circle at 86% 12%,rgba(251,146,60,.26),transparent 34%),
+        linear-gradient(135deg,#060914 0%,#0b1020 48%,#191024 100%);
+    }
+    button,input,select,textarea{font:inherit}
+    button{border:0;cursor:pointer;border-radius:14px;font-weight:900;transition:.18s ease;white-space:nowrap}
+    button:hover{transform:translateY(-1px)}
+    button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+    .app{width:min(1500px,96vw);margin:0 auto;padding:26px 0 48px}
+    .glass{
+      background:linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(16px);
+    }
+    .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;margin-bottom:18px;align-items:stretch}
+    .hero-main{padding:28px;overflow:hidden;position:relative}
+    .hero-main:after{content:"";position:absolute;right:-90px;bottom:-120px;width:330px;height:330px;background:radial-gradient(circle,rgba(225,29,72,.42),transparent 68%);filter:blur(8px)}
+    .eyebrow{margin:0 0 10px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#ffd1dc;font-weight:950}
+    h1{font-size:clamp(32px,4vw,58px);line-height:.96;margin:0 0 14px;letter-spacing:-.045em}
+    .lead{font-size:16px;line-height:1.65;color:#d8deef;margin:0;max-width:890px}
     .badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
-    .badge{border:1px solid var(--line);background:rgba(255,255,255,.075);border-radius:999px;padding:9px 12px;font-weight:800;font-size:13px;color:#fff}
-    .login{padding:20px}
-    label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#cfd7eb;font-weight:900;margin:0 0 7px}
-    input,textarea,select{width:100%;border:1px solid rgba(15,23,42,.18);border-radius:11px;background:#fff;color:#111827;padding:10px 11px;font:inherit;outline:none;transition:.15s ease}
-    textarea{resize:vertical;min-height:70px}
-    input:focus,textarea:focus,select:focus{box-shadow:0 0 0 4px rgba(255,56,92,.15);border-color:#ff6b85}
-    .login input{background:rgba(255,255,255,.1);border-color:var(--line);color:#fff}.login input::placeholder{color:#8792ad}
-    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    button{border:0;border-radius:14px;padding:11px 14px;font-weight:950;cursor:pointer;transition:.16s ease;white-space:nowrap}
-    button:hover{transform:translateY(-1px)} button:disabled{opacity:.5;cursor:not-allowed;transform:none}
-    .btn-primary{color:white;background:linear-gradient(135deg,#ff3158,#ff9f43);box-shadow:0 14px 36px rgba(255,56,92,.27)}
-    .btn-secondary{color:white;background:rgba(255,255,255,.1);border:1px solid var(--line)}
-    .btn-danger{color:white;background:rgba(255,77,109,.26);border:1px solid rgba(255,77,109,.45)}
-    .btn-good{color:#052312;background:linear-gradient(135deg,#55ffab,#b7ffd8)}
-    .btns{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.small{font-size:12px;color:var(--muted);line-height:1.45}
-    .dashboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:16px 0}
-    .scenario-card{padding:20px;position:relative;overflow:hidden}.scenario-card.locked{filter:saturate(.6);opacity:.78}.scenario-card h2{margin:0 0 8px;font-size:23px}.scenario-card p{color:var(--muted);line-height:1.5;margin:6px 0}.status-pill{display:inline-flex;gap:7px;align-items:center;margin:10px 0 13px;padding:8px 11px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.08);font-size:12px;font-weight:950}.status-pill.pass{color:#b7ffd8}.status-pill.lock{color:#ffbdc9}.status-pill.open{color:#ffe0ac}
-    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0}.stat{background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:17px;padding:12px}.stat strong{display:block;font-size:22px}.stat span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;font-weight:900;letter-spacing:.05em}
-    .workbench{display:none;grid-template-columns:430px minmax(0,1fr);gap:18px;margin-top:18px;align-items:start}.sidebar{position:sticky;top:14px;max-height:calc(100vh - 28px);overflow:auto;padding:18px}.scenario-packet h3{font-size:20px;margin:0 0 6px}.scenario-desc{color:#d4d9e8;line-height:1.5;margin:0 0 12px}.scenario-packet details{border:1px solid var(--line);background:rgba(255,255,255,.07);border-radius:16px;padding:11px;margin:10px 0}.scenario-packet summary{cursor:pointer;font-weight:950;color:#fff}.scenario-packet p{font-size:13px;line-height:1.5;color:#d8deef;margin:8px 0}.sticky-tools{position:sticky;bottom:0;margin-top:14px;padding-top:14px;background:linear-gradient(180deg,transparent,rgba(11,16,32,.96) 25%)}
-    .progress{height:10px;background:rgba(255,255,255,.13);border-radius:999px;overflow:hidden;margin:10px 0}.progress>div{height:100%;width:0;background:linear-gradient(90deg,#ff3158,#ffb86b);transition:width .2s ease}.page-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.tab{background:rgba(255,255,255,.12);border:1px solid var(--line);color:#fff;border-radius:12px;padding:10px 12px}.tab.active{background:linear-gradient(135deg,#ff3158,#ff9f43)}
-    .form-shell{padding:15px}.form-toolbar{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.form-title{font-weight:950;color:#fff}.zoom{display:flex;gap:7px;align-items:center}.page-frame{background:#e5e7eb;border-radius:18px;padding:14px;overflow:auto;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
-    .page{display:none;position:relative;width:1020px;height:1320px;margin:0 auto;background:white;box-shadow:0 18px 60px rgba(0,0,0,.35);transform-origin:top center}.page.active{display:block}.page img{position:absolute;inset:0;width:100%;height:100%;user-select:none;pointer-events:none}.field-overlay{position:absolute;z-index:2}.field-overlay input,.field-overlay textarea,.field-overlay select{height:100%;min-height:0;border-radius:2px;padding:1px 4px;font-size:11px;line-height:1.05;background:var(--field);border:1px solid var(--fieldBorder);box-shadow:none;color:#08111f}.field-overlay textarea{resize:none}.field-overlay select{font-size:10px;padding:0 2px;background:rgba(255,255,255,.02)}.field-overlay input:hover,.field-overlay textarea:hover,.field-overlay select:hover,.field-overlay input:focus,.field-overlay textarea:focus,.field-overlay select:focus{border-color:rgba(15,23,42,.35);background:rgba(255,255,255,.26);box-shadow:0 0 0 2px rgba(15,23,42,.06)}.field-overlay:hover:after,.field-overlay:focus-within:after{content:attr(data-label);position:absolute;left:0;bottom:calc(100% + 3px);max-width:260px;background:#111827;color:#fff;border:1px solid rgba(255,255,255,.18);font-size:11px;border-radius:8px;padding:5px 7px;z-index:9;white-space:normal;box-shadow:0 8px 24px rgba(0,0,0,.28)}.field-overlay.is-error input,.field-overlay.is-error textarea,.field-overlay.is-error select{border:2px solid var(--errorBorder);background:var(--errorField);box-shadow:0 0 0 3px rgba(239,68,68,.18)}
-    .modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:60;align-items:center;justify-content:center;padding:22px}.modal{width:min(820px,96vw);max-height:88vh;overflow:auto;padding:24px}.score{width:132px;height:132px;border-radius:50%;display:grid;place-items:center;margin:0 auto 14px;font-size:32px;font-weight:1000;border:10px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08)}.miss-list{display:grid;gap:8px;margin:14px 0}.miss{background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:12px;padding:10px;color:#e7eaff}.miss strong{color:white}.toast{position:fixed;right:18px;bottom:18px;background:#111827;color:white;border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:13px 15px;box-shadow:var(--shadow);opacity:0;transform:translateY(12px);transition:.2s;z-index:70}.toast.show{opacity:1;transform:translateY(0)}
-    .trainer-panel{margin-top:16px;padding:16px}.footer-note{text-align:center;font-size:12px;line-height:1.4;color:#9eabc8;margin-top:20px}.hidden{display:none!important}
-    @media(max-width:1180px){.hero,.workbench{grid-template-columns:1fr}.sidebar{position:relative;max-height:none}.page{transform-origin:top left}}
-    @media(max-width:760px){.dashboard,.stats,.form-row{grid-template-columns:1fr}.app{width:94vw}.page-frame{padding:8px}.login{padding:16px}}
-    @media print{body{background:white}.hero,.dashboard,.sidebar,.page-tabs,.form-toolbar,.trainer-panel,.footer-note{display:none!important}.workbench{display:block!important}.form-shell,.page-frame{padding:0;background:white}.page{box-shadow:none;transform:scale(1)!important}.page:not(.active){display:none!important}}
+    .badge{padding:9px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);font-size:13px;font-weight:900;color:#fff}
+    .login{padding:22px}
+    .login h2,.panel h2{margin:0 0 10px;font-size:22px}
+    .login p{color:#cbd5e1;line-height:1.5;margin:0 0 14px}
+    label{display:block;font-size:11px;letter-spacing:.075em;text-transform:uppercase;color:#344054;font-weight:950;margin:0 0 6px}
+    .login label{color:#dbe4f0}
+    input,select,textarea{
+      width:100%;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#101828;padding:10px 11px;outline:none;min-height:40px;
+    }
+    textarea{min-height:84px;resize:vertical;line-height:1.45}
+    input:focus,select:focus,textarea:focus{border-color:#fb7185;box-shadow:0 0 0 4px rgba(225,29,72,.14)}
+    .login input{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.18);color:#fff}
+    .login input::placeholder{color:#91a0bb}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .btns{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .btn-primary{color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 14px 32px rgba(225,29,72,.25);padding:12px 15px}
+    .btn-secondary{color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);padding:12px 15px}
+    .btn-dark{color:#fff;background:#111827;padding:10px 12px}
+    .btn-danger{color:#fff;background:rgba(220,38,38,.18);border:1px solid rgba(248,113,113,.45);padding:10px 12px}
+    .btn-good{color:#052e16;background:linear-gradient(135deg,#86efac,#dcfce7);padding:10px 12px}
+    .hint{font-size:12px;color:#aeb9d2;line-height:1.45;margin-top:8px}
+    .statusline{font-size:13px;font-weight:800;line-height:1.4;margin-top:10px}
+    .statusline.good{color:#bbf7d0}.statusline.bad{color:#fecdd3}.statusline.warn{color:#fde68a}
+    .dashboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:18px 0}
+    .scenario-card{padding:22px;position:relative;overflow:hidden}
+    .scenario-card:after{content:"";position:absolute;right:-80px;top:-90px;width:220px;height:220px;border-radius:50%;background:rgba(225,29,72,.18)}
+    .scenario-card h2{margin:0 0 8px;font-size:24px}
+    .scenario-card p{color:#d3d9ea;line-height:1.55;margin:7px 0}
+    .status-pill{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);border-radius:999px;padding:8px 11px;font-size:12px;font-weight:950;margin:12px 0 14px}
+    .status-pill.pass{color:#bbf7d0}.status-pill.open{color:#fed7aa}.status-pill.fail{color:#fecdd3}
+    .card-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:13px 0}
+    .stat{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);border-radius:16px;padding:10px}
+    .stat strong{display:block;font-size:24px}.stat span{font-size:11px;color:#b8c2d8;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
+    .workspace{display:none;grid-template-columns:390px minmax(0,1fr);gap:18px;margin-top:18px;align-items:start}
+    .sidebar{position:sticky;top:14px;max-height:calc(100vh - 28px);overflow:auto;padding:18px}
+    .sidebar h2{margin:0 0 8px;font-size:22px}.sidebar p{line-height:1.5;color:#d9e0f1}
+    .timer-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:14px;margin:12px 0}
+    .timer{font-size:34px;font-weight:1000;letter-spacing:-.04em}
+    .timer.warn{color:#fde68a}.timer.danger{color:#fecdd3;animation:pulse 1s infinite}
+    @keyframes pulse{50%{opacity:.62}}
+    .progress{height:10px;background:rgba(255,255,255,.13);border-radius:999px;overflow:hidden;margin:10px 0}.progress>div{height:100%;width:0;background:linear-gradient(90deg,#e11d48,#fb923c);transition:.2s ease}
+    details.packet{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.075);border-radius:16px;padding:12px;margin:10px 0}
+    details.packet summary{font-weight:950;cursor:pointer;color:#fff}
+    details.packet p,details.packet li{font-size:13px;line-height:1.52;color:#e5e9f6}
+    details.packet ul{padding-left:20px}
+    .form-panel{padding:14px;overflow:hidden}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+    .crumb{font-size:13px;color:#cbd5e1;font-weight:900}
+    .paper-wrap{background:#dbe3ef;border-radius:18px;padding:16px;overflow:auto;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
+    .paper{
+      width:min(1120px,100%);
+      min-width:980px;
+      margin:0 auto;
+      background:#fff;
+      color:#101828;
+      box-shadow:0 20px 55px rgba(0,0,0,.28);
+      border-radius:4px;
+      padding:18px;
+    }
+    .form-head{display:grid;grid-template-columns:150px 1fr 180px;gap:12px;align-items:stretch;border:2px solid #111827;margin-bottom:10px}
+    .form-mark{display:grid;place-items:center;background:#111827;color:#fff;font-weight:1000;font-size:30px;letter-spacing:-.05em;padding:12px}
+    .form-title-box{padding:10px;text-align:center;border-left:2px solid #111827;border-right:2px solid #111827}
+    .form-title-box h2{margin:0;color:#111827;font-size:23px;letter-spacing:.01em}.form-title-box p{margin:4px 0 0;color:#475467;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    .form-meta{padding:10px;font-size:12px;display:grid;align-content:center;gap:6px;color:#111827;font-weight:800}
+    .notice{border:1px dashed #94a3b8;background:#f8fafc;color:#475467;border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.45;margin-bottom:10px}
+    .section{border:2px solid #111827;margin-bottom:11px;break-inside:avoid;background:#fff}
+    .section-title{background:#111827;color:#fff;padding:7px 9px;font-weight:950;font-size:13px;letter-spacing:.045em;text-transform:uppercase;display:flex;justify-content:space-between;gap:10px}
+    .section-title span:last-child{font-size:11px;color:#cbd5e1;font-weight:850;text-transform:none;letter-spacing:0}
+    .fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-top:1px solid #111827}
+    .field{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:7px;background:#fff;min-height:74px;position:relative}
+    .field.span-2{grid-column:span 2}.field.span-3{grid-column:span 3}.field.span-4{grid-column:span 4}.field.compact{min-height:58px}
+    .field label{color:#111827;line-height:1.2;font-size:10px;margin-bottom:5px}
+    .field .required{color:#dc2626;margin-left:2px}
+    .field textarea{min-height:74px}.field.span-4 textarea{min-height:92px}
+    .field.error{background:#fff1f2;box-shadow:inset 0 0 0 2px rgba(220,38,38,.75)}
+    .field.correct{background:#f0fdf4}
+    .field small{display:block;color:#667085;font-size:10px;margin-top:4px;line-height:1.25}
+    .mini-note{font-size:11px;color:#475467;line-height:1.4;padding:8px 9px;border-top:1px solid #e2e8f0;background:#f8fafc}
+    .modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:40;align-items:center;justify-content:center;padding:22px}
+    .modal{width:min(900px,96vw);max-height:88vh;overflow:auto;padding:24px}
+    .score-circle{width:136px;height:136px;border-radius:50%;display:grid;place-items:center;margin:0 auto 14px;font-size:34px;font-weight:1000;border:10px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08)}
+    .miss-list{display:grid;gap:8px;margin-top:14px}.miss{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);border-radius:12px;padding:10px;color:#e5e7eb;line-height:1.45}.miss strong{color:#fff}.miss em{color:#cbd5e1}
+    .trainer-panel{display:none;margin-top:18px;padding:18px}.table-wrap{overflow:auto;background:rgba(255,255,255,.06);border-radius:16px;border:1px solid rgba(255,255,255,.14)}
+    table{width:100%;border-collapse:collapse;font-size:13px;color:#f8fafc}th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.12);text-align:left;vertical-align:top}th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:#cbd5e1;background:rgba(255,255,255,.08)}
+    .toast{position:fixed;right:18px;bottom:18px;background:#111827;color:#fff;border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:13px 15px;box-shadow:var(--shadow);opacity:0;transform:translateY(12px);transition:.2s;z-index:60;max-width:360px}.toast.show{opacity:1;transform:translateY(0)}
+    .footer{text-align:center;color:#aeb9d2;font-size:12px;line-height:1.45;margin-top:20px}
+    .hidden{display:none!important}
+    @media(max-width:1180px){.hero,.workspace{grid-template-columns:1fr}.sidebar{position:relative;max-height:none}.paper{min-width:920px}}
+    @media(max-width:780px){.dashboard,.form-row{grid-template-columns:1fr}.card-stats{grid-template-columns:1fr 1fr}.hero-main,.login{padding:20px}.paper-wrap{padding:10px}.app{width:min(100% - 20px,1500px)}}
+    @media print{
+      body{background:#fff;color:#000}.hero,.dashboard,.sidebar,.topbar,.trainer-panel,.footer,.toast,.modal-wrap{display:none!important}.app{width:100%;padding:0}.workspace,.form-panel{display:block!important}.form-panel{box-shadow:none;border:0;background:transparent;padding:0}.paper-wrap{background:#fff;padding:0;box-shadow:none}.paper{width:100%;min-width:0;box-shadow:none;padding:0}.section{break-inside:avoid}.field.error,.field.correct{background:#fff!important;box-shadow:none!important}
+    }
   </style>
 </head>
 <body>
-  <div class="app">
+  <div id="toast" class="toast"></div>
+  <main class="app">
     <section class="hero">
       <div class="hero-main glass">
-        <p class="eyebrow">LAVA Training • Actual ACORD 130 Simulator</p>
-        <h1>ACORD 130 Workers Compensation Application Simulator</h1>
-        <p class="lead">This version uses the uploaded ACORD 130 pages as the actual form background. VAs practice entering data directly on the same layout they will see in real work: applicant details, policy information, rating worksheet, loss history, operations, general information, and signature.</p>
-        <div class="badges"><span class="badge">Uses uploaded form image</span><span class="badge">2 graded scenarios</span><span class="badge">Scenario 2 locked until pass</span><span class="badge">3 takes per scenario</span><span class="badge">90% passing score</span></div>
-      </div>
-      <div class="login glass">
-        <p class="eyebrow">VA Access</p>
-        <div class="form-row">
-          <div><label>VA Full Name</label><input id="traineeName" placeholder="Example: Juan Dela Cruz"></div>
-          <div><label>Work Email</label><input id="traineeEmail" type="email" placeholder="name@lavatraining.com"></div>
+        <p class="eyebrow">LAVA Training • Commercial Lines</p>
+        <h1>Commercial ACORD Form Simulator</h1>
+        <p class="lead">A realistic training simulator for VAs to practice reading a scenario packet and completing commercial insurance form fields accurately. Includes Commercial Auto and Commercial Property exercises, timer, scoring, missed-field review, local result logs, and a strict <b>@lavatraining.com</b> access gate.</p>
+        <div class="badges">
+          <span class="badge">Commercial Auto Packet</span>
+          <span class="badge">Commercial Property Packet</span>
+          <span class="badge">90% Passing Score</span>
+          <span class="badge">No Absolute Overlays</span>
+          <span class="badge">Netlify Ready</span>
         </div>
-        <p class="small">The name and email are saved only in this browser's localStorage for training logs and CSV export.</p>
-        <div class="btns"><button class="btn-secondary" onclick="saveTrainee()">Save trainee info</button><a class="small" style="color:#ffd6df" href="assets/acord-130-source.pdf" target="_blank">Open uploaded ACORD 130 PDF</a></div>
       </div>
+      <aside class="login glass">
+        <h2>VA Access</h2>
+        <p>Enter the VA full name and LAVA Training email before starting. The simulator will not unlock with a personal email.</p>
+        <div class="form-row">
+          <div>
+            <label for="traineeName">Full Name</label>
+            <input id="traineeName" autocomplete="name" placeholder="Example: Juan Dela Cruz" />
+          </div>
+          <div>
+            <label for="traineeEmail">LAVA Email</label>
+            <input id="traineeEmail" autocomplete="email" placeholder="first.last@lavatraining.com" />
+          </div>
+        </div>
+        <div class="btns" style="margin-top:12px">
+          <button class="btn-primary" id="saveTraineeBtn">Save VA Info</button>
+          <button class="btn-secondary" id="clearTraineeBtn">Clear</button>
+        </div>
+        <div id="loginStatus" class="statusline warn">VA access is not verified yet.</div>
+        <div class="hint">Validation rule: full name must have at least first and last name, and email must end exactly with <b>@lavatraining.com</b>.</div>
+      </aside>
     </section>
 
     <section id="dashboard" class="dashboard"></section>
 
-    <section id="workbench" class="workbench">
+    <section id="workspace" class="workspace">
       <aside class="sidebar glass">
-        <p class="eyebrow">Scenario Packet</p>
-        <div id="scenarioPacket" class="scenario-packet"></div>
-        <div class="sticky-tools">
-          <div class="progress"><div id="completionBar"></div></div>
-          <p id="completionText" class="small">0% completed</p>
-          <div class="btns">
-            <button class="btn-secondary" onclick="saveDraft()">Save Draft</button>
-            <button class="btn-primary" onclick="gradeActiveScenario()">Submit for Grading</button>
-            <button class="btn-secondary" onclick="printCurrentPage()">Print Current Page</button>
-            <button class="btn-danger" onclick="clearDraftConfirm()">Clear Draft</button>
-          </div>
-          <p class="small">Tip: fields are clear by default to match the actual ACORD form. After submission, missed or incorrect fields will be highlighted in red for review.</p>
+        <div class="btns" style="margin-bottom:12px">
+          <button class="btn-secondary" id="backBtn">← Dashboard</button>
+          <button class="btn-danger" id="resetDraftBtn">Reset Draft</button>
         </div>
+        <h2 id="sideTitle">Scenario</h2>
+        <p id="sideDesc"></p>
+        <div class="timer-card">
+          <div class="hint">Time Remaining</div>
+          <div id="timer" class="timer">00:00</div>
+          <div class="progress"><div id="completionBar"></div></div>
+          <div id="fieldProgress" class="hint">0 of 0 fields completed</div>
+        </div>
+        <details class="packet" open>
+          <summary>Scenario Packet</summary>
+          <div id="packetContent"></div>
+        </details>
+        <details class="packet">
+          <summary>Grading Rules</summary>
+          <ul>
+            <li>Passing score is <b>90%</b>.</li>
+            <li>Each required field has equal weight.</li>
+            <li>Phone, FEIN, money, and VIN fields are normalized before grading.</li>
+            <li>Narrative fields are graded by important keywords, not exact sentence order.</li>
+            <li>Blank required fields are automatically marked incorrect.</li>
+          </ul>
+        </details>
+        <details class="packet">
+          <summary>Trainer Controls</summary>
+          <p>Use this only for review or coaching after an attempt.</p>
+          <div class="form-row">
+            <input id="trainerCode" placeholder="Trainer code" />
+            <button class="btn-dark" id="showKeyBtn">Show Key</button>
+          </div>
+          <div id="answerKeyBox" class="hint"></div>
+        </details>
       </aside>
 
-      <main class="form-shell glass">
-        <div class="form-toolbar">
-          <div><div id="formTitle" class="form-title">Select a scenario</div><div class="small" id="formMeta">Actual ACORD 130 page overlay</div></div>
-          <div class="zoom"><button class="btn-secondary" onclick="setZoom(-.05)">−</button><span id="zoomText" class="small">100%</span><button class="btn-secondary" onclick="setZoom(.05)">+</button></div>
+      <section class="form-panel glass">
+        <div class="topbar">
+          <div>
+            <div class="crumb" id="crumb">Commercial ACORD Simulator</div>
+            <div class="hint">Autosaves locally in this browser while the timer is running.</div>
+          </div>
+          <div class="btns">
+            <button class="btn-secondary" id="saveDraftBtn">Save Draft</button>
+            <button class="btn-secondary" id="printBtn">Print</button>
+            <button class="btn-good" id="submitBtn">Submit for Grading</button>
+          </div>
         </div>
-        <div class="page-tabs" id="pageTabs"></div>
-        <div class="page-frame" id="pageFrame">
-          <div class="page active" id="page1"><img src="assets/page-1.png" alt="ACORD 130 page 1"></div>
-          <div class="page" id="page2"><img src="assets/page-2.png" alt="ACORD 130 page 2"></div>
-          <div class="page" id="page3"><img src="assets/page-3.png" alt="ACORD 130 page 3"></div>
-          <div class="page" id="page4"><img src="assets/page-4.png" alt="ACORD 130 page 4"></div>
+        <div class="paper-wrap">
+          <form id="simForm" class="paper" autocomplete="off"></form>
         </div>
-      </main>
+      </section>
     </section>
 
-    <section class="trainer-panel glass">
-      <p class="eyebrow">Trainer Tools</p>
-      <div class="form-row">
-        <div><label>Trainer reset / answer key code</label><input id="trainerCode" placeholder="Enter trainer code"></div>
-        <div style="display:flex;align-items:end;gap:10px;flex-wrap:wrap"><button class="btn-secondary" onclick="unlockTrainerTools()">Unlock Tools</button><button class="btn-secondary" onclick="exportLogs()">Export Results CSV</button></div>
+    <section class="trainer-panel glass" id="trainerPanel">
+      <div class="topbar">
+        <div>
+          <h2 style="margin:0 0 6px">Local Result Logs</h2>
+          <div class="hint">These logs are saved in this browser only. Use Export CSV if you want to upload results elsewhere.</div>
+        </div>
+        <div class="btns">
+          <button class="btn-secondary" id="exportCsvBtn">Export CSV</button>
+          <button class="btn-danger" id="clearLogsBtn">Clear Logs</button>
+        </div>
       </div>
-      <div id="trainerTools" class="hidden" style="margin-top:12px">
-        <div class="btns"><button class="btn-good" onclick="showAnswerKey()">Show Answer Key for Active Scenario</button><button class="btn-danger" onclick="resetAllProgress()">Reset All Progress and Attempts</button><button class="btn-secondary" onclick="markScenarioOnePassed()">Trainer Override: Unlock Scenario 2</button></div>
-      </div>
+      <div class="table-wrap"><table><thead><tr><th>Date</th><th>VA</th><th>Email</th><th>Scenario</th><th>Score</th><th>Status</th><th>Time Used</th><th>Missed</th></tr></thead><tbody id="logsBody"></tbody></table></div>
     </section>
 
-    <p class="footer-note">Training use only. This simulator reproduces the uploaded ACORD 130 layout for familiarity and accuracy practice. It does not submit insurance applications to any carrier.</p>
+    <p class="footer">Training simulator only. This is an ACORD-style practice environment for internal LAVA VA training and is not an official ACORD form, filed application, or carrier submission.</p>
+  </main>
+
+  <div class="modal-wrap" id="resultModal">
+    <div class="modal glass">
+      <div id="resultContent"></div>
+      <div class="btns" style="justify-content:center;margin-top:18px">
+        <button class="btn-primary" id="closeResultBtn">Review Form</button>
+        <button class="btn-secondary" id="modalDashboardBtn">Back to Dashboard</button>
+      </div>
+    </div>
   </div>
 
-  <div id="resultModal" class="modal-wrap"><div class="modal glass"><div id="resultContent"></div></div></div>
-  <div id="toast" class="toast"></div>
-
 <script>
-const FIELDS = [{"id": "date", "label": "Date", "page": 1, "x": 870, "y": 31, "w": 120, "h": 32, "type": "text", "critical": true}, {"id": "agencyNameAddress", "label": "Agency name and address", "page": 1, "x": 32, "y": 86, "w": 378, "h": 104, "type": "textarea", "critical": true}, {"id": "producerName", "label": "Producer name", "page": 1, "x": 36, "y": 201, "w": 370, "h": 18, "type": "text", "critical": true}, {"id": "csrName", "label": "CS representative name", "page": 1, "x": 36, "y": 222, "w": 370, "h": 18, "type": "text"}, {"id": "producerOfficePhone", "label": "Producer office phone", "page": 1, "x": 36, "y": 245, "w": 170, "h": 17, "type": "text"}, {"id": "producerFax", "label": "Producer fax", "page": 1, "x": 36, "y": 284, "w": 170, "h": 17, "type": "text", "optionalWhenEmpty": true}, {"id": "producerEmail", "label": "Producer email address", "page": 1, "x": 36, "y": 303, "w": 370, "h": 17, "type": "text", "critical": true}, {"id": "agencyCode", "label": "Agency code", "page": 1, "x": 36, "y": 323, "w": 175, "h": 18, "type": "text"}, {"id": "agencySubCode", "label": "Agency sub code", "page": 1, "x": 225, "y": 323, "w": 180, "h": 18, "type": "text"}, {"id": "agencyCustomerId", "label": "Agency customer ID", "page": 1, "x": 36, "y": 344, "w": 370, "h": 20, "type": "text", "critical": true}, {"id": "company", "label": "Company", "page": 1, "x": 420, "y": 83, "w": 566, "h": 20, "type": "text", "critical": true}, {"id": "underwriter", "label": "Underwriter", "page": 1, "x": 420, "y": 105, "w": 566, "h": 20, "type": "text"}, {"id": "applicantName", "label": "Applicant name", "page": 1, "x": 420, "y": 126, "w": 566, "h": 20, "type": "text", "critical": true}, {"id": "applicantOfficePhone", "label": "Applicant office phone", "page": 1, "x": 420, "y": 147, "w": 280, "h": 20, "type": "text"}, {"id": "applicantMobilePhone", "label": "Applicant mobile phone", "page": 1, "x": 704, "y": 147, "w": 282, "h": 20, "type": "text"}, {"id": "mailingAddress", "label": "Mailing address", "page": 1, "x": 420, "y": 168, "w": 318, "h": 62, "type": "textarea", "critical": true}, {"id": "yearsInBusiness", "label": "Years in business", "page": 1, "x": 742, "y": 169, "w": 244, "h": 18, "type": "text", "critical": true}, {"id": "sic", "label": "SIC", "page": 1, "x": 742, "y": 188, "w": 244, "h": 18, "type": "text", "critical": true}, {"id": "naics", "label": "NAICS", "page": 1, "x": 742, "y": 207, "w": 244, "h": 18, "type": "text", "critical": true}, {"id": "website", "label": "Website address", "page": 1, "x": 742, "y": 226, "w": 244, "h": 18, "type": "text"}, {"id": "applicantEmail", "label": "Applicant email address", "page": 1, "x": 420, "y": 248, "w": 566, "h": 20, "type": "text", "critical": true}, {"id": "entityType", "label": "Entity type", "page": 1, "x": 435, "y": 267, "w": 320, "h": 26, "type": "select", "options": ["", "Sole Proprietor", "Corporation", "LLC", "Partnership", "Subchapter S Corp", "Joint Venture", "Trust", "Other", "Unincorporated Association"], "critical": true}, {"id": "creditBureauName", "label": "Credit bureau name", "page": 1, "x": 420, "y": 301, "w": 184, "h": 20, "type": "text", "optionalWhenEmpty": true}, {"id": "fein", "label": "Federal employer ID number", "page": 1, "x": 420, "y": 322, "w": 184, "h": 20, "type": "text", "critical": true}, {"id": "ncciRiskId", "label": "NCCI risk ID number", "page": 1, "x": 606, "y": 322, "w": 164, "h": 20, "type": "text", "critical": true}, {"id": "stateEmployerId", "label": "Other rating bureau / state employer registration number", "page": 1, "x": 775, "y": 322, "w": 210, "h": 20, "type": "text", "critical": true}, {"id": "submissionStatus", "label": "Status of submission", "page": 1, "x": 55, "y": 384, "w": 155, "h": 26, "type": "select", "options": ["", "Quote", "Issue Policy", "Bound", "Assigned Risk"], "critical": true}, {"id": "billingPlan", "label": "Billing plan", "page": 1, "x": 366, "y": 384, "w": 112, "h": 45, "type": "select", "options": ["", "Agency Bill", "Direct Bill"], "critical": true}, {"id": "paymentPlan", "label": "Payment plan", "page": 1, "x": 510, "y": 384, "w": 128, "h": 54, "type": "select", "options": ["", "Annual", "Semi-Annual", "Quarterly"], "critical": true}, {"id": "auditFrequency", "label": "Audit frequency", "page": 1, "x": 774, "y": 384, "w": 135, "h": 54, "type": "select", "options": ["", "At Expiration", "Monthly", "Semi-Annual", "Quarterly"], "critical": true}, {"id": "loc1Number", "label": "Location 1 number", "page": 1, "x": 38, "y": 487, "w": 38, "h": 25, "type": "text", "critical": true}, {"id": "loc1HighestFloor", "label": "Location 1 highest floor", "page": 1, "x": 80, "y": 487, "w": 46, "h": 25, "type": "text", "critical": true}, {"id": "loc1Address", "label": "Location 1 street, city, county, state, ZIP", "page": 1, "x": 130, "y": 487, "w": 855, "h": 36, "type": "text", "critical": true}, {"id": "proposedEffDate", "label": "Proposed effective date", "page": 1, "x": 34, "y": 656, "w": 190, "h": 32, "type": "text", "critical": true}, {"id": "proposedExpDate", "label": "Proposed expiration date", "page": 1, "x": 228, "y": 656, "w": 190, "h": 32, "type": "text", "critical": true}, {"id": "anniversaryDate", "label": "Normal anniversary rating date", "page": 1, "x": 421, "y": 656, "w": 210, "h": 32, "type": "text", "critical": true}, {"id": "participating", "label": "Participating / non-participating", "page": 1, "x": 655, "y": 656, "w": 126, "h": 32, "type": "select", "options": ["", "Participating", "Non-Participating"], "critical": true}, {"id": "retroPlan", "label": "Retro plan", "page": 1, "x": 786, "y": 656, "w": 198, "h": 32, "type": "text"}, {"id": "wcStates", "label": "Part 1 - Workers Compensation states", "page": 1, "x": 36, "y": 705, "w": 126, "h": 45, "type": "text", "critical": true}, {"id": "employersEachAccident", "label": "Employer liability - each accident", "page": 1, "x": 170, "y": 700, "w": 275, "h": 20, "type": "text", "critical": true}, {"id": "employersDiseasePolicyLimit", "label": "Employer liability - disease policy limit", "page": 1, "x": 170, "y": 724, "w": 275, "h": 20, "type": "text", "critical": true}, {"id": "employersDiseaseEachEmployee", "label": "Employer liability - disease each employee", "page": 1, "x": 170, "y": 746, "w": 275, "h": 20, "type": "text", "critical": true}, {"id": "otherStates", "label": "Part 3 - Other states", "page": 1, "x": 454, "y": 705, "w": 126, "h": 45, "type": "text"}, {"id": "deductibleMedical", "label": "Medical deductible", "page": 1, "x": 610, "y": 705, "w": 95, "h": 20, "type": "text"}, {"id": "deductibleIndemnity", "label": "Indemnity deductible", "page": 1, "x": 610, "y": 730, "w": 95, "h": 20, "type": "text"}, {"id": "amountPercent", "label": "Amount / percent", "page": 1, "x": 714, "y": 705, "w": 62, "h": 45, "type": "text"}, {"id": "otherCoverages", "label": "Other coverages", "page": 1, "x": 786, "y": 705, "w": 150, "h": 65, "type": "textarea"}, {"id": "dividendPlanSafetyGroup", "label": "Dividend plan / safety group", "page": 1, "x": 36, "y": 777, "w": 218, "h": 22, "type": "text"}, {"id": "additionalCompanyInfo", "label": "Additional company information", "page": 1, "x": 258, "y": 777, "w": 728, "h": 35, "type": "textarea"}, {"id": "additionalEndorsements", "label": "Additional coverages / endorsements", "page": 1, "x": 36, "y": 818, "w": 950, "h": 42, "type": "textarea"}, {"id": "premiumTotalAllStates", "label": "Total estimated annual premium all states", "page": 1, "x": 35, "y": 888, "w": 307, "h": 26, "type": "text", "critical": true}, {"id": "premiumMinimumAllStates", "label": "Total minimum premium all states", "page": 1, "x": 350, "y": 888, "w": 315, "h": 26, "type": "text", "critical": true}, {"id": "premiumDepositAllStates", "label": "Total deposit premium all states", "page": 1, "x": 674, "y": 888, "w": 310, "h": 26, "type": "text", "critical": true}, {"id": "contact_inspection_name", "label": "Inspection contact name", "page": 1, "x": 67, "y": 956, "w": 280, "h": 19, "type": "text"}, {"id": "contact_inspection_office", "label": "Inspection office phone", "page": 1, "x": 354, "y": 956, "w": 178, "h": 19, "type": "text"}, {"id": "contact_inspection_mobile", "label": "Inspection mobile phone", "page": 1, "x": 540, "y": 956, "w": 145, "h": 19, "type": "text"}, {"id": "contact_inspection_email", "label": "Inspection email", "page": 1, "x": 690, "y": 956, "w": 292, "h": 19, "type": "text"}, {"id": "contact_accounting_name", "label": "Accounting contact name", "page": 1, "x": 67, "y": 978, "w": 280, "h": 19, "type": "text"}, {"id": "contact_accounting_office", "label": "Accounting office phone", "page": 1, "x": 354, "y": 978, "w": 178, "h": 19, "type": "text"}, {"id": "contact_accounting_mobile", "label": "Accounting mobile phone", "page": 1, "x": 540, "y": 978, "w": 145, "h": 19, "type": "text"}, {"id": "contact_accounting_email", "label": "Accounting email", "page": 1, "x": 690, "y": 978, "w": 292, "h": 19, "type": "text"}, {"id": "contact_claims_name", "label": "Claims contact name", "page": 1, "x": 67, "y": 1000, "w": 280, "h": 19, "type": "text"}, {"id": "contact_claims_office", "label": "Claims office phone", "page": 1, "x": 354, "y": 1000, "w": 178, "h": 19, "type": "text"}, {"id": "contact_claims_mobile", "label": "Claims mobile phone", "page": 1, "x": 540, "y": 1000, "w": 145, "h": 19, "type": "text"}, {"id": "contact_claims_email", "label": "Claims email", "page": 1, "x": 690, "y": 1000, "w": 292, "h": 19, "type": "text"}, {"id": "contact_info_name", "label": "Audit / info contact name", "page": 1, "x": 67, "y": 1020, "w": 280, "h": 19, "type": "text"}, {"id": "contact_info_office", "label": "Audit / info office phone", "page": 1, "x": 354, "y": 1020, "w": 178, "h": 19, "type": "text"}, {"id": "contact_info_mobile", "label": "Audit / info mobile phone", "page": 1, "x": 540, "y": 1020, "w": 145, "h": 19, "type": "text"}, {"id": "contact_info_email", "label": "Audit / info email", "page": 1, "x": 690, "y": 1020, "w": 292, "h": 19, "type": "text"}, {"id": "ownerState", "label": "Owner state", "page": 1, "x": 32, "y": 1088, "w": 30, "h": 28, "type": "text", "critical": true}, {"id": "ownerLoc", "label": "Owner location", "page": 1, "x": 65, "y": 1088, "w": 42, "h": 28, "type": "text", "critical": true}, {"id": "ownerName", "label": "Owner/officer name", "page": 1, "x": 110, "y": 1088, "w": 166, "h": 28, "type": "text", "critical": true}, {"id": "ownerDob", "label": "Owner date of birth", "page": 1, "x": 280, "y": 1088, "w": 107, "h": 28, "type": "text", "critical": true}, {"id": "ownerTitle", "label": "Title / relationship", "page": 1, "x": 392, "y": 1088, "w": 92, "h": 28, "type": "text", "critical": true}, {"id": "ownerOwnership", "label": "Ownership %", "page": 1, "x": 487, "y": 1088, "w": 42, "h": 28, "type": "text", "critical": true}, {"id": "ownerDuties", "label": "Owner duties", "page": 1, "x": 533, "y": 1088, "w": 200, "h": 28, "type": "text", "critical": true}, {"id": "ownerIncExc", "label": "Included / excluded", "page": 1, "x": 740, "y": 1088, "w": 48, "h": 28, "type": "select", "options": ["", "Included", "Excluded"], "critical": true}, {"id": "ownerClassCode", "label": "Owner class code", "page": 1, "x": 792, "y": 1088, "w": 65, "h": 28, "type": "text", "critical": true}, {"id": "ownerPayroll", "label": "Owner remuneration / payroll", "page": 1, "x": 862, "y": 1088, "w": 122, "h": 28, "type": "text", "critical": true}, {"id": "stateRatingSheetNumber", "label": "State rating sheet number", "page": 2, "x": 220, "y": 39, "w": 46, "h": 24, "type": "text", "critical": true}, {"id": "stateRatingSheetTotal", "label": "Total sheets", "page": 2, "x": 286, "y": 39, "w": 50, "h": 24, "type": "text", "critical": true}, {"id": "ratingAgencyCustomerId", "label": "Agency customer ID on rating sheet", "page": 2, "x": 704, "y": 39, "w": 284, "h": 24, "type": "text", "critical": true}, {"id": "ratingState", "label": "Rating information - state", "page": 2, "x": 32, "y": 137, "w": 240, "h": 28, "type": "text", "critical": true}, {"id": "row1_loc", "label": "Rating row 1 loc", "page": 2, "x": 30, "y": 194, "w": 42, "h": 30, "type": "text", "critical": true}, {"id": "row1_classCode", "label": "Rating row 1 class code", "page": 2, "x": 78, "y": 194, "w": 78, "h": 30, "type": "text", "critical": true}, {"id": "row1_descCode", "label": "Rating row 1 description code", "page": 2, "x": 162, "y": 194, "w": 45, "h": 30, "type": "text"}, {"id": "row1_category", "label": "Rating row 1 category / duties / classification", "page": 2, "x": 212, "y": 194, "w": 288, "h": 30, "type": "text", "critical": true}, {"id": "row1_empFullTime", "label": "Rating row 1 full-time employees", "page": 2, "x": 505, "y": 194, "w": 45, "h": 30, "type": "text", "critical": true}, {"id": "row1_empPartTime", "label": "Rating row 1 part-time employees", "page": 2, "x": 553, "y": 194, "w": 44, "h": 30, "type": "text", "critical": true}, {"id": "row1_sic", "label": "Rating row 1 SIC", "page": 2, "x": 602, "y": 194, "w": 48, "h": 30, "type": "text", "critical": true}, {"id": "row1_naics", "label": "Rating row 1 NAICS", "page": 2, "x": 657, "y": 194, "w": 55, "h": 30, "type": "text", "critical": true}, {"id": "row1_payroll", "label": "Rating row 1 estimated annual remuneration / payroll", "page": 2, "x": 718, "y": 194, "w": 108, "h": 30, "type": "text", "critical": true}, {"id": "row1_rate", "label": "Rating row 1 rate", "page": 2, "x": 832, "y": 194, "w": 48, "h": 30, "type": "text", "critical": true}, {"id": "row1_manualPremium", "label": "Rating row 1 estimated annual manual premium", "page": 2, "x": 886, "y": 194, "w": 100, "h": 30, "type": "text", "critical": true}, {"id": "row2_loc", "label": "Rating row 2 loc", "page": 2, "x": 30, "y": 235, "w": 42, "h": 30, "type": "text", "critical": true}, {"id": "row2_classCode", "label": "Rating row 2 class code", "page": 2, "x": 78, "y": 235, "w": 78, "h": 30, "type": "text", "critical": true}, {"id": "row2_descCode", "label": "Rating row 2 description code", "page": 2, "x": 162, "y": 235, "w": 45, "h": 30, "type": "text"}, {"id": "row2_category", "label": "Rating row 2 category / duties / classification", "page": 2, "x": 212, "y": 235, "w": 288, "h": 30, "type": "text", "critical": true}, {"id": "row2_empFullTime", "label": "Rating row 2 full-time employees", "page": 2, "x": 505, "y": 235, "w": 45, "h": 30, "type": "text", "critical": true}, {"id": "row2_empPartTime", "label": "Rating row 2 part-time employees", "page": 2, "x": 553, "y": 235, "w": 44, "h": 30, "type": "text", "critical": true}, {"id": "row2_sic", "label": "Rating row 2 SIC", "page": 2, "x": 602, "y": 235, "w": 48, "h": 30, "type": "text", "critical": true}, {"id": "row2_naics", "label": "Rating row 2 NAICS", "page": 2, "x": 657, "y": 235, "w": 55, "h": 30, "type": "text", "critical": true}, {"id": "row2_payroll", "label": "Rating row 2 estimated annual remuneration / payroll", "page": 2, "x": 718, "y": 235, "w": 108, "h": 30, "type": "text", "critical": true}, {"id": "row2_rate", "label": "Rating row 2 rate", "page": 2, "x": 832, "y": 235, "w": 48, "h": 30, "type": "text", "critical": true}, {"id": "row2_manualPremium", "label": "Rating row 2 estimated annual manual premium", "page": 2, "x": 886, "y": 235, "w": 100, "h": 30, "type": "text", "critical": true}, {"id": "row3_loc", "label": "Rating row 3 loc", "page": 2, "x": 30, "y": 276, "w": 42, "h": 30, "type": "text", "critical": true}, {"id": "row3_classCode", "label": "Rating row 3 class code", "page": 2, "x": 78, "y": 276, "w": 78, "h": 30, "type": "text", "critical": true}, {"id": "row3_descCode", "label": "Rating row 3 description code", "page": 2, "x": 162, "y": 276, "w": 45, "h": 30, "type": "text"}, {"id": "row3_category", "label": "Rating row 3 category / duties / classification", "page": 2, "x": 212, "y": 276, "w": 288, "h": 30, "type": "text", "critical": true}, {"id": "row3_empFullTime", "label": "Rating row 3 full-time employees", "page": 2, "x": 505, "y": 276, "w": 45, "h": 30, "type": "text", "critical": true}, {"id": "row3_empPartTime", "label": "Rating row 3 part-time employees", "page": 2, "x": 553, "y": 276, "w": 44, "h": 30, "type": "text", "critical": true}, {"id": "row3_sic", "label": "Rating row 3 SIC", "page": 2, "x": 602, "y": 276, "w": 48, "h": 30, "type": "text", "critical": true}, {"id": "row3_naics", "label": "Rating row 3 NAICS", "page": 2, "x": 657, "y": 276, "w": 55, "h": 30, "type": "text", "critical": true}, {"id": "row3_payroll", "label": "Rating row 3 estimated annual remuneration / payroll", "page": 2, "x": 718, "y": 276, "w": 108, "h": 30, "type": "text", "critical": true}, {"id": "row3_rate", "label": "Rating row 3 rate", "page": 2, "x": 832, "y": 276, "w": 48, "h": 30, "type": "text", "critical": true}, {"id": "row3_manualPremium", "label": "Rating row 3 estimated annual manual premium", "page": 2, "x": 886, "y": 276, "w": 100, "h": 30, "type": "text", "critical": true}, {"id": "prem_state", "label": "Premium state", "page": 2, "x": 34, "y": 810, "w": 190, "h": 18, "type": "text", "critical": true}, {"id": "prem_totalManual", "label": "Total manual premium", "page": 2, "x": 305, "y": 830, "w": 192, "h": 18, "type": "text", "critical": true}, {"id": "prem_increasedLimits", "label": "Increased limits", "page": 2, "x": 305, "y": 850, "w": 192, "h": 18, "type": "text"}, {"id": "prem_deductible", "label": "Deductible premium adjustment", "page": 2, "x": 305, "y": 870, "w": 192, "h": 18, "type": "text"}, {"id": "prem_expMod", "label": "Experience or merit modification", "page": 2, "x": 305, "y": 906, "w": 192, "h": 18, "type": "text", "critical": true}, {"id": "prem_assignedRisk", "label": "Assigned risk surcharge", "page": 2, "x": 305, "y": 952, "w": 192, "h": 18, "type": "text"}, {"id": "prem_arap", "label": "ARAP", "page": 2, "x": 305, "y": 974, "w": 192, "h": 18, "type": "text"}, {"id": "prem_scheduleRating", "label": "Schedule rating", "page": 2, "x": 790, "y": 850, "w": 190, "h": 18, "type": "text"}, {"id": "prem_ccpap", "label": "CCPAP", "page": 2, "x": 790, "y": 870, "w": 190, "h": 18, "type": "text"}, {"id": "prem_standardPremium", "label": "Standard premium", "page": 2, "x": 790, "y": 890, "w": 190, "h": 18, "type": "text", "critical": true}, {"id": "prem_premiumDiscount", "label": "Premium discount", "page": 2, "x": 790, "y": 914, "w": 190, "h": 18, "type": "text"}, {"id": "prem_expenseConstant", "label": "Expense constant", "page": 2, "x": 790, "y": 936, "w": 190, "h": 18, "type": "text", "critical": true}, {"id": "prem_taxesAssessments", "label": "Taxes / assessments", "page": 2, "x": 790, "y": 958, "w": 190, "h": 18, "type": "text"}, {"id": "prem_totalEstimatedAnnual", "label": "Total estimated annual premium", "page": 2, "x": 35, "y": 1008, "w": 300, "h": 26, "type": "text", "critical": true}, {"id": "prem_minimumPremium", "label": "Minimum premium", "page": 2, "x": 350, "y": 1008, "w": 300, "h": 26, "type": "text", "critical": true}, {"id": "prem_depositPremium", "label": "Deposit premium", "page": 2, "x": 675, "y": 1008, "w": 310, "h": 26, "type": "text", "critical": true}, {"id": "remarks", "label": "Remarks", "page": 2, "x": 35, "y": 1058, "w": 950, "h": 188, "type": "textarea", "optionalWhenEmpty": true}, {"id": "lossAgencyCustomerId", "label": "Agency customer ID on loss history page", "page": 3, "x": 704, "y": 42, "w": 284, "h": 24, "type": "text", "critical": true}, {"id": "lossRunAttached", "label": "Loss run attached", "page": 3, "x": 760, "y": 75, "w": 222, "h": 24, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "loss1_year", "label": "Loss history row 1 year", "page": 3, "x": 35, "y": 110, "w": 52, "h": 20, "type": "text", "critical": true}, {"id": "loss1_carrier", "label": "Loss history row 1 carrier", "page": 3, "x": 94, "y": 110, "w": 332, "h": 18, "type": "text", "critical": true}, {"id": "loss1_policy", "label": "Loss history row 1 policy number", "page": 3, "x": 94, "y": 131, "w": 332, "h": 18, "type": "text", "critical": true}, {"id": "loss1_annualPremium", "label": "Loss history row 1 annual premium", "page": 3, "x": 435, "y": 110, "w": 138, "h": 38, "type": "text", "critical": true}, {"id": "loss1_mod", "label": "Loss history row 1 mod", "page": 3, "x": 578, "y": 110, "w": 70, "h": 38, "type": "text", "critical": true}, {"id": "loss1_claims", "label": "Loss history row 1 number of claims", "page": 3, "x": 650, "y": 110, "w": 72, "h": 38, "type": "text", "critical": true}, {"id": "loss1_amountPaid", "label": "Loss history row 1 amount paid", "page": 3, "x": 725, "y": 110, "w": 128, "h": 38, "type": "text", "critical": true}, {"id": "loss1_reserve", "label": "Loss history row 1 reserve", "page": 3, "x": 858, "y": 110, "w": 128, "h": 38, "type": "text", "critical": true}, {"id": "loss2_year", "label": "Loss history row 2 year", "page": 3, "x": 35, "y": 153, "w": 52, "h": 20, "type": "text", "critical": true}, {"id": "loss2_carrier", "label": "Loss history row 2 carrier", "page": 3, "x": 94, "y": 153, "w": 332, "h": 18, "type": "text", "critical": true}, {"id": "loss2_policy", "label": "Loss history row 2 policy number", "page": 3, "x": 94, "y": 174, "w": 332, "h": 18, "type": "text", "critical": true}, {"id": "loss2_annualPremium", "label": "Loss history row 2 annual premium", "page": 3, "x": 435, "y": 153, "w": 138, "h": 38, "type": "text", "critical": true}, {"id": "loss2_mod", "label": "Loss history row 2 mod", "page": 3, "x": 578, "y": 153, "w": 70, "h": 38, "type": "text", "critical": true}, {"id": "loss2_claims", "label": "Loss history row 2 number of claims", "page": 3, "x": 650, "y": 153, "w": 72, "h": 38, "type": "text", "critical": true}, {"id": "loss2_amountPaid", "label": "Loss history row 2 amount paid", "page": 3, "x": 725, "y": 153, "w": 128, "h": 38, "type": "text", "critical": true}, {"id": "loss2_reserve", "label": "Loss history row 2 reserve", "page": 3, "x": 858, "y": 153, "w": 128, "h": 38, "type": "text", "critical": true}, {"id": "natureBusiness", "label": "Nature of business / description of operations", "page": 3, "x": 30, "y": 358, "w": 955, "h": 210, "type": "textarea", "critical": true}, {"id": "q1", "label": "General information question 1 Y/N", "page": 3, "x": 958, "y": 610, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q1_explain", "label": "General information question 1 explanation if Yes", "page": 3, "x": 570, "y": 614, "w": 382, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q2", "label": "General information question 2 Y/N", "page": 3, "x": 958, "y": 656, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q2_explain", "label": "General information question 2 explanation if Yes", "page": 3, "x": 570, "y": 660, "w": 382, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q3", "label": "General information question 3 Y/N", "page": 3, "x": 958, "y": 708, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q3_explain", "label": "General information question 3 explanation if Yes", "page": 3, "x": 570, "y": 712, "w": 382, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q4", "label": "General information question 4 Y/N", "page": 3, "x": 958, "y": 752, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q4_explain", "label": "General information question 4 explanation if Yes", "page": 3, "x": 570, "y": 756, "w": 382, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q5", "label": "General information question 5 Y/N", "page": 3, "x": 958, "y": 797, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q5_explain", "label": "General information question 5 explanation if Yes", "page": 3, "x": 570, "y": 801, "w": 382, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q6", "label": "General information question 6 Y/N", "page": 3, "x": 958, "y": 836, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q6_explain", "label": "General information question 6 explanation if Yes", "page": 3, "x": 570, "y": 840, "w": 382, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q7", "label": "General information question 7 Y/N", "page": 3, "x": 958, "y": 884, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q7_explain", "label": "General information question 7 explanation if Yes", "page": 3, "x": 570, "y": 888, "w": 382, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q8", "label": "General information question 8 Y/N", "page": 3, "x": 958, "y": 932, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q8_explain", "label": "General information question 8 explanation if Yes", "page": 3, "x": 570, "y": 936, "w": 382, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q9", "label": "General information question 9 Y/N", "page": 3, "x": 958, "y": 977, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q9_explain", "label": "General information question 9 explanation if Yes", "page": 3, "x": 570, "y": 981, "w": 382, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q10", "label": "General information question 10 Y/N", "page": 3, "x": 958, "y": 1022, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q10_explain", "label": "General information question 10 explanation if Yes", "page": 3, "x": 570, "y": 1026, "w": 382, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q11", "label": "General information question 11 Y/N", "page": 3, "x": 958, "y": 1066, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q11_explain", "label": "General information question 11 explanation if Yes", "page": 3, "x": 570, "y": 1070, "w": 382, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q12", "label": "General information question 12 Y/N", "page": 3, "x": 958, "y": 1110, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q12_explain", "label": "General information question 12 explanation if Yes", "page": 3, "x": 570, "y": 1114, "w": 382, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q13", "label": "General information question 13 Y/N", "page": 3, "x": 958, "y": 1154, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q13_explain", "label": "General information question 13 explanation if Yes", "page": 3, "x": 570, "y": 1158, "w": 382, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q14", "label": "General information question 14 Y/N", "page": 3, "x": 958, "y": 1198, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q14_explain", "label": "General information question 14 explanation if Yes", "page": 3, "x": 570, "y": 1202, "w": 382, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q15", "label": "General information question 15 Y/N", "page": 3, "x": 958, "y": 1242, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q15_explain", "label": "General information question 15 explanation if Yes", "page": 3, "x": 570, "y": 1246, "w": 382, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q16", "label": "General information question 16 Y/N", "page": 3, "x": 958, "y": 1278, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q16_explain", "label": "General information question 16 explanation if Yes", "page": 3, "x": 570, "y": 1282, "w": 382, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "signatureAgencyCustomerId", "label": "Agency customer ID on signature page", "page": 4, "x": 704, "y": 42, "w": 284, "h": 24, "type": "text", "critical": true}, {"id": "q17", "label": "General information question 17 Y/N", "page": 4, "x": 958, "y": 82, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q17_explain", "label": "General information question 17 explanation if Yes", "page": 4, "x": 610, "y": 86, "w": 342, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q18", "label": "General information question 18 Y/N", "page": 4, "x": 958, "y": 124, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q18_explain", "label": "General information question 18 explanation if Yes", "page": 4, "x": 610, "y": 128, "w": 342, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q19", "label": "General information question 19 Y/N", "page": 4, "x": 958, "y": 166, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q19_explain", "label": "General information question 19 explanation if Yes", "page": 4, "x": 610, "y": 170, "w": 342, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q20", "label": "General information question 20 Y/N", "page": 4, "x": 958, "y": 208, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q20_explain", "label": "General information question 20 explanation if Yes", "page": 4, "x": 610, "y": 212, "w": 342, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q21", "label": "General information question 21 Y/N", "page": 4, "x": 958, "y": 250, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q21_explain", "label": "General information question 21 explanation if Yes", "page": 4, "x": 610, "y": 254, "w": 342, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q22", "label": "General information question 22 Y/N", "page": 4, "x": 958, "y": 292, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q22_explain", "label": "General information question 22 explanation if Yes", "page": 4, "x": 610, "y": 296, "w": 342, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q23", "label": "General information question 23 Y/N", "page": 4, "x": 958, "y": 334, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q23_explain", "label": "General information question 23 explanation if Yes", "page": 4, "x": 610, "y": 338, "w": 342, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "q24", "label": "General information question 24 Y/N", "page": 4, "x": 958, "y": 376, "w": 36, "h": 28, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "q24_explain", "label": "General information question 24 explanation if Yes", "page": 4, "x": 610, "y": 380, "w": 342, "h": 22, "type": "text", "optionalWhenEmpty": true, "placeholder": "Explain YES responses"}, {"id": "privacyNoticeGiven", "label": "Privacy notice given to applicant", "page": 4, "x": 55, "y": 431, "w": 180, "h": 20, "type": "select", "options": ["", "Yes", "No"], "critical": true}, {"id": "applicantInitials", "label": "Applicant initials", "page": 4, "x": 900, "y": 581, "w": 82, "h": 20, "type": "text", "critical": true}, {"id": "applicantSignature", "label": "Applicant signature", "page": 4, "x": 35, "y": 1247, "w": 330, "h": 30, "type": "text", "critical": true}, {"id": "signatureDate", "label": "Signature date", "page": 4, "x": 370, "y": 1247, "w": 118, "h": 30, "type": "text", "critical": true}, {"id": "producerSignature", "label": "Producer signature", "page": 4, "x": 494, "y": 1247, "w": 330, "h": 30, "type": "text", "critical": true}, {"id": "nationalProducerNumber", "label": "National producer number", "page": 4, "x": 830, "y": 1247, "w": 158, "h": 30, "type": "text", "critical": true}];
-const SCENARIOS = {"auto": {"title": "Scenario 1 - Auto-Related Business", "tag": "Required first scenario", "description": "RoadStar Auto Services LLC is an auto repair and local towing operation. Transfer the intake packet into the ACORD 130 exactly as if you were completing the real form.", "packet": "<h3>RoadStar Auto Services LLC</h3><p class='scenario-desc'>Auto repair and local towing workers compensation submission.</p>\n    <details open><summary>Applicant / Agency Information</summary>\n      <p><b>Date:</b> 07/25/2026</p>\n      <p><b>Agency:</b> LAVA Training Agency, 101 Training Blvd, Davao City 8000</p>\n      <p><b>Producer:</b> David Reyes &nbsp; <b>CSR:</b> Rhea Santos &nbsp; <b>Phone:</b> 800-555-1300 &nbsp; <b>Email:</b> training@lavatraining.com</p>\n      <p><b>Agency code/sub-code/customer ID:</b> LVA-130 / WC-AUTO / RSA-2026-001</p>\n      <p><b>Company/Underwriter:</b> Pioneer Mutual Insurance Co / Megan Lawson</p>\n      <p><b>Applicant:</b> RoadStar Auto Services LLC | Office 614-555-0188 | Mobile 614-555-0199 | Email admin@roadstarauto.example</p>\n      <p><b>Mailing address:</b> 2250 Buckeye Auto Mall Dr Columbus OH 43219</p>\n      <p><b>Yrs in business:</b> 6 | <b>SIC:</b> 7538 | <b>NAICS:</b> 811111 | <b>Website:</b> roadstarauto.example</p>\n      <p><b>Entity:</b> LLC | <b>FEIN:</b> 31-8459021 | <b>NCCI:</b> OH-7783492 | <b>State employer ID:</b> OH-998271</p>\n    </details>\n    <details><summary>Submission, Location, Policy, Premium</summary>\n      <p><b>Status/Billing/Payment/Audit:</b> Quote / Direct Bill / Annual / Annual</p>\n      <p><b>Location 1:</b> Loc 1, highest floor 2, 2250 Buckeye Auto Mall Dr Columbus Franklin County OH 43219</p>\n      <p><b>Policy dates:</b> Eff 08/01/2026, Exp 08/01/2027, Anniversary 08/01/2026</p>\n      <p><b>Participating:</b> Non-Participating | <b>Retro:</b> None | <b>WC states:</b> OH | <b>Other states:</b> KY</p>\n      <p><b>Employer liability:</b> Each Accident 1000000; Disease Policy 1000000; Disease Each Employee 1000000</p>\n      <p><b>Deductibles:</b> Medical N/A; Indemnity N/A; Amount/% N/A</p>\n      <p><b>Other coverages:</b> usl; voluntary; foreign; no</p>\n      <p><b>Additional company info:</b> auto repair; no body shop; no towing beyond local; written safety</p>\n      <p><b>Endorsements:</b> waiver of subrogation; where required by written contract</p>\n      <p><b>Total/minimum/deposit premium:</b> 24108 / 1000 / 6027</p>\n    </details>\n    <details><summary>Contacts and Included / Excluded Individual</summary>\n      <p><b>Inspection:</b> Carlos Nguyen, 614-555-0210, 614-555-0211, carlos@roadstarauto.example</p>\n      <p><b>Accounting:</b> Mira Patel, 614-555-0220, 614-555-0221, billing@roadstarauto.example</p>\n      <p><b>Claims:</b> Jordan Ellis, 614-555-0230, 614-555-0231, claims@roadstarauto.example</p>\n      <p><b>Audit/info:</b> Mira Patel, 614-555-0220, 614-555-0221, audit@roadstarauto.example</p>\n      <p><b>Owner/officer:</b> Anthony R. Cruz, DOB 1984-04-12, Managing Member, 75% ownership, Included, class 8810, payroll 120000. Duties: management; customer service; quality control</p>\n    </details>\n    <details><summary>State Rating Worksheet and Premium</summary>\n      <p><b>Sheet:</b> 1 of 1 | <b>Customer ID:</b> RSA-2026-001 | <b>State:</b> OH</p>\n      <p><b>Row 1:</b> Loc 1; Class 8380; Desc AUTO; automobile service; repair; mechanics; FT/PT 12/3; SIC 7538; NAICS 811111; Payroll 620000; Rate 3.10; Premium 19220</p>\n      <p><b>Row 2:</b> Loc 1; Class 8393; Desc TOW; local towing; roadside assistance; FT/PT 3/1; SIC 7538; NAICS 488410; Payroll 160000; Rate 2.40; Premium 3840</p>\n      <p><b>Row 3:</b> Loc 1; Class 8810; Desc CLER; clerical; office; employees; FT/PT 2/1; SIC 7538; NAICS 811111; Payroll 110000; Rate 0.15; Premium 165</p>\n      <p><b>Premium details:</b> State OH; Total manual 23225; Increased limits 0; Deductible 0; Exp mod 1.02; Assigned risk 0; ARAP 0; Schedule rating 0; CCPAP 0; Standard premium 23690; Discount 0; Expense constant 250; Taxes/assessments 168; Total/minimum/deposit 24108 / 1000 / 6027</p>\n    </details>\n    <details><summary>Loss History, Operations, and General Information</summary>\n      <p><b>Loss run attached:</b> Yes</p>\n      <p><b>Loss row 1:</b> 2025; Travelers; policy WC-TRV-543210; premium 22300; mod 1.02; claims 1; paid 4200; reserve 0</p>\n      <p><b>Loss row 2:</b> 2024; Liberty Mutual; policy WC-LM-102884; premium 21150; mod 0.98; claims 0; paid 0; reserve 0</p>\n      <p><b>Nature of business:</b> auto repair; oil changes; brake service; diagnostics; local towing; roadside assistance; no vehicle sales; no body shop</p>\n      <p><b>Q1-Q16:</b> Q1 No; Q2 Yes - waste oil; stored in approved containers; vendor pickup; Q3 Yes - two-post lifts; vehicle lifts; Q4 No; Q5 No; Q6 Yes - windshield replacement; subcontracted; 10%; Q7 No; Q8 Yes - written safety; ppe; lockout; lift inspection; Q9 Yes - tow drivers; company trucks; Q10 No - ; Q11 No - ; Q12 No; Q13 No; Q14 Yes - kentucky; emergency towing; quarterly; Q15 No; Q16 Yes - post-offer; physical; lifting</p>\n      <p><b>Q17-Q24:</b> Q17 Yes - garage liability; commercial auto; Q18 No; Q19 Yes - group health; eligible full-time; Q20 No; Q21 No; Q22 Yes - one bookkeeper; work from home; Q23 No; Q24 No</p>\n      <p><b>Signature:</b> Privacy notice Yes; initials AC; applicant signature Anthony R. Cruz; date 07/25/2026; producer signature David Reyes; NPN 4455667</p>\n    </details>", "expected": {"date": "07/25/2026", "agencyNameAddress": {"keywords": ["LAVA Training Agency", "101 Training Blvd", "Davao City", "8000"], "min": 3}, "producerName": "David Reyes", "csrName": "Rhea Santos", "producerOfficePhone": "800-555-1300", "producerFax": "", "producerEmail": "training@lavatraining.com", "agencyCode": "LVA-130", "agencySubCode": "WC-AUTO", "agencyCustomerId": "RSA-2026-001", "company": "Pioneer Mutual Insurance Co", "underwriter": "Megan Lawson", "applicantName": "RoadStar Auto Services LLC", "applicantOfficePhone": "614-555-0188", "applicantMobilePhone": "614-555-0199", "mailingAddress": "2250 Buckeye Auto Mall Dr Columbus OH 43219", "yearsInBusiness": "6", "sic": "7538", "naics": "811111", "website": "roadstarauto.example", "applicantEmail": "admin@roadstarauto.example", "entityType": "LLC", "creditBureauName": "N/A", "fein": "31-8459021", "ncciRiskId": "OH-7783492", "stateEmployerId": "OH-998271", "submissionStatus": "Quote", "billingPlan": "Direct Bill", "paymentPlan": "Annual", "auditFrequency": "Annual", "loc1Number": "1", "loc1HighestFloor": "2", "loc1Address": "2250 Buckeye Auto Mall Dr Columbus Franklin County OH 43219", "proposedEffDate": "08/01/2026", "proposedExpDate": "08/01/2027", "anniversaryDate": "08/01/2026", "participating": "Non-Participating", "retroPlan": "None", "wcStates": "OH", "employersEachAccident": "1000000", "employersDiseasePolicyLimit": "1000000", "employersDiseaseEachEmployee": "1000000", "otherStates": "KY", "deductibleMedical": "N/A", "deductibleIndemnity": "N/A", "amountPercent": "N/A", "otherCoverages": {"keywords": ["usl", "voluntary", "foreign", "no"], "min": 2}, "dividendPlanSafetyGroup": "None", "additionalCompanyInfo": {"keywords": ["auto repair", "no body shop", "no towing beyond local", "written safety"], "min": 3}, "additionalEndorsements": {"keywords": ["waiver of subrogation", "where required by written contract"], "min": 1}, "premiumTotalAllStates": "24108", "premiumMinimumAllStates": "1000", "premiumDepositAllStates": "6027", "contact_inspection_name": "Carlos Nguyen", "contact_inspection_office": "614-555-0210", "contact_inspection_mobile": "614-555-0211", "contact_inspection_email": "carlos@roadstarauto.example", "contact_accounting_name": "Mira Patel", "contact_accounting_office": "614-555-0220", "contact_accounting_mobile": "614-555-0221", "contact_accounting_email": "billing@roadstarauto.example", "contact_claims_name": "Jordan Ellis", "contact_claims_office": "614-555-0230", "contact_claims_mobile": "614-555-0231", "contact_claims_email": "claims@roadstarauto.example", "contact_info_name": "Mira Patel", "contact_info_office": "614-555-0220", "contact_info_mobile": "614-555-0221", "contact_info_email": "audit@roadstarauto.example", "ownerState": "OH", "ownerLoc": "1", "ownerName": "Anthony R. Cruz", "ownerDob": "1984-04-12", "ownerTitle": "Managing Member", "ownerOwnership": "75", "ownerDuties": {"keywords": ["management", "customer service", "quality control"], "min": 2}, "ownerIncExc": "Included", "ownerClassCode": "8810", "ownerPayroll": "120000", "stateRatingSheetNumber": "1", "stateRatingSheetTotal": "1", "ratingAgencyCustomerId": "RSA-2026-001", "ratingState": "OH", "row1_loc": "1", "row1_classCode": "8380", "row1_descCode": "AUTO", "row1_category": {"keywords": ["automobile service", "repair", "mechanics"], "min": 2}, "row1_empFullTime": "12", "row1_empPartTime": "3", "row1_sic": "7538", "row1_naics": "811111", "row1_payroll": "620000", "row1_rate": "3.10", "row1_manualPremium": "19220", "row2_loc": "1", "row2_classCode": "8393", "row2_descCode": "TOW", "row2_category": {"keywords": ["local towing", "roadside assistance"], "min": 1}, "row2_empFullTime": "3", "row2_empPartTime": "1", "row2_sic": "7538", "row2_naics": "488410", "row2_payroll": "160000", "row2_rate": "2.40", "row2_manualPremium": "3840", "row3_loc": "1", "row3_classCode": "8810", "row3_descCode": "CLER", "row3_category": {"keywords": ["clerical", "office", "employees"], "min": 2}, "row3_empFullTime": "2", "row3_empPartTime": "1", "row3_sic": "7538", "row3_naics": "811111", "row3_payroll": "110000", "row3_rate": "0.15", "row3_manualPremium": "165", "prem_state": "OH", "prem_totalManual": "23225", "prem_increasedLimits": "0", "prem_deductible": "0", "prem_expMod": "1.02", "prem_assignedRisk": "0", "prem_arap": "0", "prem_scheduleRating": "0", "prem_ccpap": "0", "prem_standardPremium": "23690", "prem_premiumDiscount": "0", "prem_expenseConstant": "250", "prem_taxesAssessments": "168", "prem_totalEstimatedAnnual": "24108", "prem_minimumPremium": "1000", "prem_depositPremium": "6027", "remarks": {"keywords": ["training", "rates per 100", "payroll"], "min": 0}, "lossAgencyCustomerId": "RSA-2026-001", "lossRunAttached": "Yes", "loss1_year": "2025", "loss1_carrier": "Travelers", "loss1_policy": "WC-TRV-543210", "loss1_annualPremium": "22300", "loss1_mod": "1.02", "loss1_claims": "1", "loss1_amountPaid": "4200", "loss1_reserve": "0", "loss2_year": "2024", "loss2_carrier": "Liberty Mutual", "loss2_policy": "WC-LM-102884", "loss2_annualPremium": "21150", "loss2_mod": "0.98", "loss2_claims": "0", "loss2_amountPaid": "0", "loss2_reserve": "0", "natureBusiness": {"keywords": ["auto repair", "oil changes", "brake service", "diagnostics", "local towing", "roadside assistance", "no vehicle sales", "no body shop"], "min": 6}, "q1": "No", "q1_explain": "", "q2": "Yes", "q2_explain": {"keywords": ["waste oil", "stored in approved containers", "vendor pickup"], "min": 2}, "q3": "Yes", "q3_explain": {"keywords": ["two-post lifts", "vehicle lifts"], "min": 1}, "q4": "No", "q4_explain": "", "q5": "No", "q5_explain": "", "q6": "Yes", "q6_explain": {"keywords": ["windshield replacement", "subcontracted", "10%"], "min": 2}, "q7": "No", "q7_explain": "", "q8": "Yes", "q8_explain": {"keywords": ["written safety", "ppe", "lockout", "lift inspection"], "min": 2}, "q9": "Yes", "q9_explain": {"keywords": ["tow drivers", "company trucks"], "min": 1}, "q10": "No", "q10_explain": "", "q11": "No", "q11_explain": "", "q12": "No", "q12_explain": "", "q13": "No", "q13_explain": "", "q14": "Yes", "q14_explain": {"keywords": ["kentucky", "emergency towing", "quarterly"], "min": 1}, "q15": "No", "q15_explain": "", "q16": "Yes", "q16_explain": {"keywords": ["post-offer", "physical", "lifting"], "min": 1}, "signatureAgencyCustomerId": "RSA-2026-001", "q17": "Yes", "q17_explain": {"keywords": ["garage liability", "commercial auto"], "min": 1}, "q18": "No", "q18_explain": "", "q19": "Yes", "q19_explain": {"keywords": ["group health", "eligible full-time"], "min": 1}, "q20": "No", "q20_explain": "", "q21": "No", "q21_explain": "", "q22": "Yes", "q22_explain": {"keywords": ["one bookkeeper", "work from home"], "min": 1}, "q23": "No", "q23_explain": "", "q24": "No", "q24_explain": "", "privacyNoticeGiven": "Yes", "applicantInitials": "AC", "applicantSignature": "Anthony R. Cruz", "signatureDate": "07/25/2026", "producerSignature": "David Reyes", "nationalProducerNumber": "4455667"}}, "property": {"title": "Scenario 2 - Commercial Property-Related Business", "tag": "Unlocks after Scenario 1 is passed", "description": "Harborview Property Maintenance Inc performs commercial property maintenance including janitorial, pressure washing, parking lot cleanup, and landscaping.", "packet": "<h3>Harborview Property Maintenance Inc</h3><p class='scenario-desc'>Commercial property maintenance workers compensation submission.</p>\n    <details open><summary>Applicant / Agency Information</summary>\n      <p><b>Date:</b> 07/25/2026</p>\n      <p><b>Agency:</b> LAVA Training Agency, 101 Training Blvd, Davao City 8000</p>\n      <p><b>Producer:</b> David Reyes &nbsp; <b>CSR:</b> Rhea Santos &nbsp; <b>Phone:</b> 800-555-1300 &nbsp; <b>Email:</b> training@lavatraining.com</p>\n      <p><b>Agency code/sub-code/customer ID:</b> LVA-130 / WC-PROP / HPM-2026-002</p>\n      <p><b>Company/Underwriter:</b> Atlantic Property & Casualty / Olivia Hart</p>\n      <p><b>Applicant:</b> Harborview Property Maintenance Inc | Office 813-555-0147 | Mobile 813-555-0148 | Email ops@harborviewpm.example</p>\n      <p><b>Mailing address:</b> 8800 Bayline Commerce Pkwy Tampa FL 33619</p>\n      <p><b>Yrs in business:</b> 9 | <b>SIC:</b> 7349 | <b>NAICS:</b> 561790 | <b>Website:</b> harborviewpm.example</p>\n      <p><b>Entity:</b> Corporation | <b>FEIN:</b> 86-7154029 | <b>NCCI:</b> 420118771 | <b>State employer ID:</b> FL-1209847</p>\n    </details>\n    <details><summary>Submission, Location, Policy, Premium</summary>\n      <p><b>Status/Billing/Payment/Audit:</b> Quote / Direct Bill / Quarterly / Quarterly</p>\n      <p><b>Location 1:</b> Loc 1, highest floor 5, 8800 Bayline Commerce Pkwy Tampa Hillsborough County FL 33619</p>\n      <p><b>Policy dates:</b> Eff 08/15/2026, Exp 08/15/2027, Anniversary 08/15/2026</p>\n      <p><b>Participating:</b> Non-Participating | <b>Retro:</b> None | <b>WC states:</b> FL | <b>Other states:</b> GA</p>\n      <p><b>Employer liability:</b> Each Accident 1000000; Disease Policy 1000000; Disease Each Employee 1000000</p>\n      <p><b>Deductibles:</b> Medical N/A; Indemnity N/A; Amount/% N/A</p>\n      <p><b>Other coverages:</b> managed care option yes; usl and h no; voluntary comp no; foreign cov no</p>\n      <p><b>Additional company info:</b> commercial property maintenance; no roofing; no structural construction; written safety; sds</p>\n      <p><b>Endorsements:</b> waiver of subrogation; written contract; alternate employer not requested</p>\n      <p><b>Total/minimum/deposit premium:</b> 36594 / 1250 / 9149</p>\n    </details>\n    <details><summary>Contacts and Included / Excluded Individual</summary>\n      <p><b>Inspection:</b> Lucy Martin, 813-555-0151, 813-555-0152, lucy@harborviewpm.example</p>\n      <p><b>Accounting:</b> Mateo Flores, 813-555-0161, 813-555-0162, accounting@harborviewpm.example</p>\n      <p><b>Claims:</b> Nina Patel, 813-555-0171, 813-555-0172, claims@harborviewpm.example</p>\n      <p><b>Audit/info:</b> Hannah Price, 813-555-0181, 813-555-0182, audit@harborviewpm.example</p>\n      <p><b>Owner/officer:</b> Lucy J. Martin, DOB 1978-11-09, President, 80% ownership, Included, class 8810, payroll 150000. Duties: executive supervision; client relationship; management</p>\n    </details>\n    <details><summary>State Rating Worksheet and Premium</summary>\n      <p><b>Sheet:</b> 1 of 1 | <b>Customer ID:</b> HPM-2026-002 | <b>State:</b> FL</p>\n      <p><b>Row 1:</b> Loc 1; Class 9014; Desc JAN; janitorial; building cleaning; contractor; FT/PT 28/6; SIC 7349; NAICS 561790; Payroll 780000; Rate 2.95; Premium 23010</p>\n      <p><b>Row 2:</b> Loc 1; Class 0042; Desc LAND; landscape; gardening; grounds maintenance; FT/PT 9/4; SIC 7349; NAICS 561790; Payroll 310000; Rate 3.85; Premium 11935</p>\n      <p><b>Row 3:</b> Loc 1; Class 8810; Desc CLER; clerical; office; employees; FT/PT 4/2; SIC 7349; NAICS 561790; Payroll 210000; Rate 0.19; Premium 399</p>\n      <p><b>Premium details:</b> State FL; Total manual 35344; Increased limits 0; Deductible 0; Exp mod 1.03; Assigned risk 0; ARAP 0; Schedule rating 0; CCPAP 0; Standard premium 36404; Discount 0; Expense constant 250; Taxes/assessments -60; Total/minimum/deposit 36594 / 1250 / 9149</p>\n    </details>\n    <details><summary>Loss History, Operations, and General Information</summary>\n      <p><b>Loss run attached:</b> Yes</p>\n      <p><b>Loss row 1:</b> 2025; Hartford; policy WC-HIG-88817; premium 33800; mod 1.03; claims 2; paid 12500; reserve 1800</p>\n      <p><b>Loss row 2:</b> 2024; Travelers; policy WC-TRV-772018; premium 31900; mod 0.99; claims 1; paid 2100; reserve 0</p>\n      <p><b>Nature of business:</b> commercial property maintenance; shopping centers; office buildings; restaurants; janitorial; pressure washing; parking lot cleanup; landscaping; no roofing; no structural construction</p>\n      <p><b>Q1-Q16:</b> Q1 No; Q2 Yes - commercial cleaning chemicals; sds; supply room; Q3 Yes - lift; ladder; pressure washing; facade; three stories; no roofing; Q4 No; Q5 No; Q6 Yes - specialty pressure washing; irrigation repair; subcontractors; certificates; Q7 No; Q8 Yes - written safety; ppe; ladder; lift; sds; incident reporting; Q9 Yes - company vans; transport crews; daily; Q10 Yes - two employees; over age 60; no employees under 16; Q11 Yes - peak summer; groundskeeping; Q12 No; Q13 No; Q14 Yes - georgia; service calls; Q15 No; Q16 No - </p>\n      <p><b>Q17-Q24:</b> Q17 Yes - general liability; commercial property; same insurer; Q18 No; Q19 Yes - employee health plan; Q20 No; Q21 No; Q22 Yes - two administrative employees; work from home; Q23 No; Q24 No</p>\n      <p><b>Signature:</b> Privacy notice Yes; initials LM; applicant signature Lucy J. Martin; date 07/25/2026; producer signature David Reyes; NPN 4455667</p>\n    </details>", "expected": {"date": "07/25/2026", "agencyNameAddress": {"keywords": ["LAVA Training Agency", "101 Training Blvd", "Davao City", "8000"], "min": 3}, "producerName": "David Reyes", "csrName": "Rhea Santos", "producerOfficePhone": "800-555-1300", "producerFax": "", "producerEmail": "training@lavatraining.com", "agencyCode": "LVA-130", "agencySubCode": "WC-PROP", "agencyCustomerId": "HPM-2026-002", "company": "Atlantic Property & Casualty", "underwriter": "Olivia Hart", "applicantName": "Harborview Property Maintenance Inc", "applicantOfficePhone": "813-555-0147", "applicantMobilePhone": "813-555-0148", "mailingAddress": "8800 Bayline Commerce Pkwy Tampa FL 33619", "yearsInBusiness": "9", "sic": "7349", "naics": "561790", "website": "harborviewpm.example", "applicantEmail": "ops@harborviewpm.example", "entityType": "Corporation", "creditBureauName": "N/A", "fein": "86-7154029", "ncciRiskId": "420118771", "stateEmployerId": "FL-1209847", "submissionStatus": "Quote", "billingPlan": "Direct Bill", "paymentPlan": "Quarterly", "auditFrequency": "Quarterly", "loc1Number": "1", "loc1HighestFloor": "5", "loc1Address": "8800 Bayline Commerce Pkwy Tampa Hillsborough County FL 33619", "proposedEffDate": "08/15/2026", "proposedExpDate": "08/15/2027", "anniversaryDate": "08/15/2026", "participating": "Non-Participating", "retroPlan": "None", "wcStates": "FL", "employersEachAccident": "1000000", "employersDiseasePolicyLimit": "1000000", "employersDiseaseEachEmployee": "1000000", "otherStates": "GA", "deductibleMedical": "N/A", "deductibleIndemnity": "N/A", "amountPercent": "N/A", "otherCoverages": {"keywords": ["managed care option yes", "usl and h no", "voluntary comp no", "foreign cov no"], "min": 2}, "dividendPlanSafetyGroup": "None", "additionalCompanyInfo": {"keywords": ["commercial property maintenance", "no roofing", "no structural construction", "written safety", "sds"], "min": 3}, "additionalEndorsements": {"keywords": ["waiver of subrogation", "written contract", "alternate employer not requested"], "min": 1}, "premiumTotalAllStates": "36594", "premiumMinimumAllStates": "1250", "premiumDepositAllStates": "9149", "contact_inspection_name": "Lucy Martin", "contact_inspection_office": "813-555-0151", "contact_inspection_mobile": "813-555-0152", "contact_inspection_email": "lucy@harborviewpm.example", "contact_accounting_name": "Mateo Flores", "contact_accounting_office": "813-555-0161", "contact_accounting_mobile": "813-555-0162", "contact_accounting_email": "accounting@harborviewpm.example", "contact_claims_name": "Nina Patel", "contact_claims_office": "813-555-0171", "contact_claims_mobile": "813-555-0172", "contact_claims_email": "claims@harborviewpm.example", "contact_info_name": "Hannah Price", "contact_info_office": "813-555-0181", "contact_info_mobile": "813-555-0182", "contact_info_email": "audit@harborviewpm.example", "ownerState": "FL", "ownerLoc": "1", "ownerName": "Lucy J. Martin", "ownerDob": "1978-11-09", "ownerTitle": "President", "ownerOwnership": "80", "ownerDuties": {"keywords": ["executive supervision", "client relationship", "management"], "min": 2}, "ownerIncExc": "Included", "ownerClassCode": "8810", "ownerPayroll": "150000", "stateRatingSheetNumber": "1", "stateRatingSheetTotal": "1", "ratingAgencyCustomerId": "HPM-2026-002", "ratingState": "FL", "row1_loc": "1", "row1_classCode": "9014", "row1_descCode": "JAN", "row1_category": {"keywords": ["janitorial", "building cleaning", "contractor"], "min": 2}, "row1_empFullTime": "28", "row1_empPartTime": "6", "row1_sic": "7349", "row1_naics": "561790", "row1_payroll": "780000", "row1_rate": "2.95", "row1_manualPremium": "23010", "row2_loc": "1", "row2_classCode": "0042", "row2_descCode": "LAND", "row2_category": {"keywords": ["landscape", "gardening", "grounds maintenance"], "min": 2}, "row2_empFullTime": "9", "row2_empPartTime": "4", "row2_sic": "7349", "row2_naics": "561790", "row2_payroll": "310000", "row2_rate": "3.85", "row2_manualPremium": "11935", "row3_loc": "1", "row3_classCode": "8810", "row3_descCode": "CLER", "row3_category": {"keywords": ["clerical", "office", "employees"], "min": 2}, "row3_empFullTime": "4", "row3_empPartTime": "2", "row3_sic": "7349", "row3_naics": "561790", "row3_payroll": "210000", "row3_rate": "0.19", "row3_manualPremium": "399", "prem_state": "FL", "prem_totalManual": "35344", "prem_increasedLimits": "0", "prem_deductible": "0", "prem_expMod": "1.03", "prem_assignedRisk": "0", "prem_arap": "0", "prem_scheduleRating": "0", "prem_ccpap": "0", "prem_standardPremium": "36404", "prem_premiumDiscount": "0", "prem_expenseConstant": "250", "prem_taxesAssessments": "-60", "prem_totalEstimatedAnnual": "36594", "prem_minimumPremium": "1250", "prem_depositPremium": "9149", "remarks": {"keywords": ["training", "rates per 100", "payroll"], "min": 0}, "lossAgencyCustomerId": "HPM-2026-002", "lossRunAttached": "Yes", "loss1_year": "2025", "loss1_carrier": "Hartford", "loss1_policy": "WC-HIG-88817", "loss1_annualPremium": "33800", "loss1_mod": "1.03", "loss1_claims": "2", "loss1_amountPaid": "12500", "loss1_reserve": "1800", "loss2_year": "2024", "loss2_carrier": "Travelers", "loss2_policy": "WC-TRV-772018", "loss2_annualPremium": "31900", "loss2_mod": "0.99", "loss2_claims": "1", "loss2_amountPaid": "2100", "loss2_reserve": "0", "natureBusiness": {"keywords": ["commercial property maintenance", "shopping centers", "office buildings", "restaurants", "janitorial", "pressure washing", "parking lot cleanup", "landscaping", "no roofing", "no structural construction"], "min": 7}, "q1": "No", "q1_explain": "", "q2": "Yes", "q2_explain": {"keywords": ["commercial cleaning chemicals", "sds", "supply room"], "min": 2}, "q3": "Yes", "q3_explain": {"keywords": ["lift", "ladder", "pressure washing", "facade", "three stories", "no roofing"], "min": 3}, "q4": "No", "q4_explain": "", "q5": "No", "q5_explain": "", "q6": "Yes", "q6_explain": {"keywords": ["specialty pressure washing", "irrigation repair", "subcontractors", "certificates"], "min": 2}, "q7": "No", "q7_explain": "", "q8": "Yes", "q8_explain": {"keywords": ["written safety", "ppe", "ladder", "lift", "sds", "incident reporting"], "min": 3}, "q9": "Yes", "q9_explain": {"keywords": ["company vans", "transport crews", "daily"], "min": 2}, "q10": "Yes", "q10_explain": {"keywords": ["two employees", "over age 60", "no employees under 16"], "min": 2}, "q11": "Yes", "q11_explain": {"keywords": ["peak summer", "groundskeeping"], "min": 1}, "q12": "No", "q12_explain": "", "q13": "No", "q13_explain": "", "q14": "Yes", "q14_explain": {"keywords": ["georgia", "service calls"], "min": 1}, "q15": "No", "q15_explain": "", "q16": "No", "q16_explain": "", "signatureAgencyCustomerId": "HPM-2026-002", "q17": "Yes", "q17_explain": {"keywords": ["general liability", "commercial property", "same insurer"], "min": 2}, "q18": "No", "q18_explain": "", "q19": "Yes", "q19_explain": {"keywords": ["employee health plan"], "min": 1}, "q20": "No", "q20_explain": "", "q21": "No", "q21_explain": "", "q22": "Yes", "q22_explain": {"keywords": ["two administrative employees", "work from home"], "min": 1}, "q23": "No", "q23_explain": "", "q24": "No", "q24_explain": "", "privacyNoticeGiven": "Yes", "applicantInitials": "LM", "applicantSignature": "Lucy J. Martin", "signatureDate": "07/25/2026", "producerSignature": "David Reyes", "nationalProducerNumber": "4455667"}}};
-const PAGE_TITLES = {1:'Page 1 - Applicant / Policy',2:'Page 2 - State Rating Worksheet',3:'Page 3 - Loss + Operations',4:'Page 4 - Signature'};
 const PASSING_SCORE = 90;
-const MAX_ATTEMPTS = 3;
 const TRAINER_CODE = 'LAVA2026';
-const STORAGE_KEY = 'lava_acord130_actual_progress_v2';
-const DRAFT_KEY = 'lava_acord130_actual_drafts_v2';
-const LOG_KEY = 'lava_acord130_actual_logs_v2';
-const TRAINEE_KEY = 'lava_acord130_actual_trainee_v2';
-let activeScenario = null;
-let activePage = 1;
-let zoom = 1;
+const STORAGE = {
+  trainee:'lava_commercial_acord_trainee_v1',
+  drafts:'lava_commercial_acord_drafts_v1',
+  logs:'lava_commercial_acord_logs_v1',
+  progress:'lava_commercial_acord_progress_v1'
+};
 
+const scenarios = {
+  auto:{
+    id:'auto',
+    title:'Commercial Auto ACORD-Style Application',
+    short:'Complete the Commercial Auto application packet for a contractor with scheduled autos, hired auto, and non-owned auto exposure.',
+    formNo:'ACORD 125 / 127 Training Packet',
+    timerMinutes:50,
+    scenarioName:'Summit Mobile Equipment LLC',
+    packet:`
+      <p><b>Scenario:</b> Summit Mobile Equipment LLC rents, delivers, and services light construction equipment for contractors in Colorado. The producer is preparing a Business Auto quote with scheduled vehicles only, plus hired and non-owned auto coverage.</p>
+      <ul>
+        <li><b>Application date:</b> 06/01/2026. <b>Effective:</b> 07/01/2026 to 07/01/2027.</li>
+        <li><b>Agency:</b> LAVA Training Insurance Services, producer Maya Torres, phone 800-555-1270, email commercial@lavatraining.com, agency customer ID SME-CA-2601.</li>
+        <li><b>Market:</b> Travelers Commercial. Underwriter Hannah Patel.</li>
+        <li><b>Applicant:</b> Summit Mobile Equipment LLC, FEIN 84-3927714, mailing address 2250 West Alameda Avenue, Denver, CO 80223, phone 303-555-0188, email operations@summitmobileequip.example.</li>
+        <li><b>Business:</b> NAICS 532412, SIC 7353, LLC, 7 years in business. Rents skid steers, lifts, compressors, and small tools; delivers equipment to job sites; no passenger transportation and no hazardous material hauling.</li>
+        <li><b>Coverage:</b> Business Auto, Symbol 7 Scheduled Autos, $1,000,000 CSL liability, $5,000 medical payments, $1,000,000 UM/UIM, $1,000 comprehensive deductible, $1,000 collision deductible, Symbol 8 hired auto, Symbol 9 non-owned auto.</li>
+        <li><b>Additional coverages requested:</b> hired auto physical damage, auto loan/lease gap, and employees as insureds.</li>
+        <li><b>Vehicles:</b> 2023 Ford F-350 VIN 1FT8W3BN6PEC12345, cost new $68,500, garaged at Denver location, service/delivery truck, radius 100 miles. 2021 Isuzu NPR VIN JALC4W16XM7009876, cost new $54,000, garaged at same Denver location, box truck for equipment delivery, radius 100 miles.</li>
+        <li><b>Drivers:</b> Caleb Reed DOB 04/14/1988, license CO-R3389201. Nina Alvarez DOB 09/22/1992, license CO-A7712093. MVRs will be ordered. No accidents in the last 3 years.</li>
+        <li><b>Prior insurance:</b> Nationwide Commercial, policy BAP-7742009, expiring premium $18,420, no losses.</li>
+        <li><b>Underwriting notes:</b> Employees use trucks to deliver rented equipment and perform field service. All drivers are employees, vehicles are GPS tracked, personal use is prohibited, and drivers complete annual motor vehicle safety training.</li>
+        <li><b>Questions:</b> No vehicles leased to others. Yes, employees may use rented vehicles when scheduled trucks are down. No filings required. No hazardous materials. Signature: Evan Brooks, Managing Member, signed 06/01/2026.</li>
+      </ul>`,
+    sections:[
+      {title:'Producer / Agency Information', note:'Complete all producer and market fields from the packet.', fields:[
+        f('app_date','Application Date','date','2026-06-01'),
+        f('agency_name','Agency Name','text','LAVA Training Insurance Services',{span:2}),
+        f('agency_customer_id','Agency Customer ID','text','SME-CA-2601'),
+        f('producer_name','Producer Name','text','Maya Torres'),
+        f('agency_phone','Agency Phone','tel','800-555-1270',{compare:'phone'}),
+        f('agency_email','Agency Email','email','commercial@lavatraining.com',{span:2}),
+        f('company','Carrier / Company','text','Travelers Commercial',{span:2}),
+        f('underwriter','Underwriter','text','Hannah Patel',{span:2})
+      ]},
+      {title:'Applicant Information', fields:[
+        f('applicant_name','Applicant Name','text','Summit Mobile Equipment LLC',{span:2}),
+        f('entity_type','Entity Type','select','LLC',{options:['','Individual','Corporation','LLC','Partnership','Other']}),
+        f('fein','FEIN','text','84-3927714',{compare:'digits'}),
+        f('mailing_address','Mailing Address','textarea','2250 West Alameda Avenue Denver CO 80223',{span:2,compare:'address'}),
+        f('applicant_phone','Applicant Phone','tel','303-555-0188',{compare:'phone'}),
+        f('applicant_email','Applicant Email','email','operations@summitmobileequip.example'),
+        f('naics','NAICS','text','532412',{compare:'digits'}),
+        f('sic','SIC','text','7353',{compare:'digits'}),
+        f('years_business','Years in Business','number','7'),
+        f('business_description','Description of Operations','textarea','',{span:4,keywords:['rents','skid steers','lifts','compressors','small tools','delivers','job sites','no passenger transportation','no hazardous material'],min:6,expectedLabel:'Must mention equipment rental/service, delivery to job sites, and no passenger/hazmat exposure.'})
+      ]},
+      {title:'Policy / Coverage Requested', fields:[
+        f('effective_date','Proposed Effective Date','date','2026-07-01'),
+        f('expiration_date','Proposed Expiration Date','date','2027-07-01'),
+        f('billing_plan','Billing Plan','select','Direct Bill',{options:['','Agency Bill','Direct Bill']}),
+        f('payment_plan','Payment Plan','select','Monthly',{options:['','Annual','Quarterly','Monthly']}),
+        f('policy_type','Policy Type','select','Business Auto',{options:['','Business Auto','Garage','Motor Carrier','Truckers']}),
+        f('coverage_symbol','Covered Auto Symbol','select','Symbol 7 Scheduled Autos',{options:['','Symbol 1 Any Auto','Symbol 2 Owned Autos Only','Symbol 7 Scheduled Autos','Symbol 8 Hired Autos Only','Symbol 9 Non-Owned Autos Only'],span:2}),
+        f('liability_limit','Liability Limit CSL','text','1000000',{compare:'money'}),
+        f('med_pay','Medical Payments','text','5000',{compare:'money'}),
+        f('um_uim','UM/UIM Limit','text','1000000',{compare:'money'}),
+        f('comp_ded','Comprehensive Deductible','text','1000',{compare:'money'}),
+        f('coll_ded','Collision Deductible','text','1000',{compare:'money'}),
+        f('hired_auto_symbol','Hired Auto Symbol','select','8',{options:['','7','8','9']}),
+        f('non_owned_symbol','Non-Owned Auto Symbol','select','9',{options:['','7','8','9']}),
+        f('additional_coverages','Additional Coverages / Endorsements','textarea','',{span:4,keywords:['hired auto physical damage','auto loan','lease gap','employees as insureds'],min:3,expectedLabel:'Hired auto physical damage, auto loan/lease gap, and employees as insureds.'})
+      ]},
+      {title:'Vehicle Schedule', note:'Use one row per scheduled vehicle. VINs are graded without spaces or dashes.', fields:[
+        f('veh1_year','Vehicle 1 Year','text','2023'),
+        f('veh1_make_model','Vehicle 1 Make / Model','text','Ford F-350',{span:2,accepted:['Ford F-350','2023 Ford F-350']}),
+        f('veh1_vin','Vehicle 1 VIN','text','1FT8W3BN6PEC12345',{compare:'vin'}),
+        f('veh1_cost','Vehicle 1 Cost New','text','68500',{compare:'money'}),
+        f('veh1_garage','Vehicle 1 Garaging Location','text','Denver CO',{accepted:['Denver CO','2250 West Alameda Avenue Denver CO 80223','Denver location']}),
+        f('veh1_use','Vehicle 1 Use','text','Service/delivery truck',{span:2,keywords:['service','delivery','truck'],min:2,expectedLabel:'Service/delivery truck'}),
+        f('veh1_radius','Vehicle 1 Radius','text','100',{compare:'digits'}),
+        f('veh2_year','Vehicle 2 Year','text','2021'),
+        f('veh2_make_model','Vehicle 2 Make / Model','text','Isuzu NPR',{span:2,accepted:['Isuzu NPR','2021 Isuzu NPR']}),
+        f('veh2_vin','Vehicle 2 VIN','text','JALC4W16XM7009876',{compare:'vin'}),
+        f('veh2_cost','Vehicle 2 Cost New','text','54000',{compare:'money'}),
+        f('veh2_garage','Vehicle 2 Garaging Location','text','Denver CO',{accepted:['Denver CO','2250 West Alameda Avenue Denver CO 80223','Denver location']}),
+        f('veh2_use','Vehicle 2 Use','text','Box truck for equipment delivery',{span:2,keywords:['box truck','equipment','delivery'],min:2,expectedLabel:'Box truck for equipment delivery'}),
+        f('veh2_radius','Vehicle 2 Radius','text','100',{compare:'digits'})
+      ]},
+      {title:'Driver Schedule / Prior Insurance / Underwriting', fields:[
+        f('driver1_name','Driver 1 Name','text','Caleb Reed'),
+        f('driver1_dob','Driver 1 DOB','date','1988-04-14'),
+        f('driver1_license','Driver 1 License','text','CO-R3389201',{compare:'code'}),
+        f('mvr_order','MVRs Ordered?','select','Yes',{options:['','Yes','No']}),
+        f('driver2_name','Driver 2 Name','text','Nina Alvarez'),
+        f('driver2_dob','Driver 2 DOB','date','1992-09-22'),
+        f('driver2_license','Driver 2 License','text','CO-A7712093',{compare:'code'}),
+        f('accidents','Accidents Last 3 Years?','select','No',{options:['','Yes','No']}),
+        f('prior_carrier','Prior Carrier','text','Nationwide Commercial',{span:2}),
+        f('prior_policy','Prior Policy Number','text','BAP-7742009',{compare:'code'}),
+        f('prior_premium','Expiring Premium','text','18420',{compare:'money'}),
+        f('losses','Prior Auto Losses','text','0',{accepted:['0','No','None','No losses']}),
+        f('leased_to_others','Vehicles Leased to Others?','select','No',{options:['','Yes','No']}),
+        f('rented_vehicle_use','Rented Vehicle Use?','select','Yes',{options:['','Yes','No']}),
+        f('filings_required','Filings Required?','select','No',{options:['','Yes','No']}),
+        f('hazmat','Hazardous Materials?','select','No',{options:['','Yes','No']}),
+        f('operations_narrative','Commercial Auto Underwriting Narrative','textarea','',{span:4,keywords:['employees','deliver','rented equipment','field service','gps','personal use is prohibited','annual motor vehicle safety training'],min:5,expectedLabel:'Employee delivery/service use, GPS tracking, no personal use, annual driver safety training.'}),
+        f('applicant_signature','Applicant Signature','text','Evan Brooks',{span:2}),
+        f('signature_title','Title','text','Managing Member'),
+        f('signature_date','Signature Date','date','2026-06-01')
+      ]}
+    ]
+  },
+  property:{
+    id:'property',
+    title:'Commercial Property ACORD-Style Application',
+    short:'Complete the Commercial Property application packet for a mixed office and retail building owner.',
+    formNo:'ACORD 125 / 140 Training Packet',
+    timerMinutes:50,
+    scenarioName:'Pinecrest Business Center LLC',
+    packet:`
+      <p><b>Scenario:</b> Pinecrest Business Center LLC owns and leases a two-story mixed office/retail building in Charlotte, North Carolina. The producer is completing a Commercial Property quote.</p>
+      <ul>
+        <li><b>Application date:</b> 06/03/2026. <b>Effective:</b> 08/01/2026 to 08/01/2027.</li>
+        <li><b>Agency:</b> LAVA Training Insurance Services, producer David Reyes, phone 800-555-1400, email commercial@lavatraining.com, agency customer ID PBC-CP-2603.</li>
+        <li><b>Market:</b> The Hartford. Underwriter Olivia Hart.</li>
+        <li><b>Applicant:</b> Pinecrest Business Center LLC, FEIN 91-2087733, mailing address 4100 Pinecrest Commons Road, Charlotte, NC 28211, phone 704-555-0142, email admin@pinecrestcenter.example.</li>
+        <li><b>Business:</b> LLC, NAICS 531120, SIC 6512. Operations are office and retail lessor. Tenants include a coffee shop, fitness studio, accounting office, and administrative office. No manufacturing and no overnight occupancy.</li>
+        <li><b>Premises:</b> Location 1, Building 1, 4100 Pinecrest Commons Road, Charlotte, Mecklenburg County, NC 28211. Building owner interest. Joisted masonry construction, 2 stories, 18,500 square feet, built in 2008.</li>
+        <li><b>Updates:</b> Roof updated 2021, wiring 2018, plumbing 2019, heating 2019. Protection class 04. Fully sprinklered. Central station fire/burglar alarm. Hydrant 500 feet; fire station 2 miles.</li>
+        <li><b>Coverage requested:</b> Building $3,200,000; Business Personal Property $150,000; Business Income $450,000; Ordinance or Law $250,000; Equipment Breakdown Yes; Deductible $2,500; 90% coinsurance; Replacement Cost; Special causes of loss; Inflation Guard 4%.</li>
+        <li><b>Mortgagee:</b> First Carolina Bank ISAOA, 900 Trade Street, Charlotte, NC 28202, loan number FCB-778812.</li>
+        <li><b>Loss history:</b> Prior carrier Travelers, prior policy CMP-6019982, one 2024 water damage claim paid $7,800; pipe repaired and mitigation completed. No open reserves.</li>
+        <li><b>Underwriting questions:</b> Building is not vacant. Cooking exposure exists only from the coffee shop with permitted equipment. No flammable manufacturing. Burglar alarm yes. Sprinkler yes. Not in flood zone per applicant. Not historical. Signature: Laura Chen, Managing Member, signed 06/03/2026.</li>
+      </ul>`,
+    sections:[
+      {title:'Producer / Agency Information', fields:[
+        f('app_date','Application Date','date','2026-06-03'),
+        f('agency_name','Agency Name','text','LAVA Training Insurance Services',{span:2}),
+        f('agency_customer_id','Agency Customer ID','text','PBC-CP-2603'),
+        f('producer_name','Producer Name','text','David Reyes'),
+        f('agency_phone','Agency Phone','tel','800-555-1400',{compare:'phone'}),
+        f('agency_email','Agency Email','email','commercial@lavatraining.com',{span:2}),
+        f('company','Carrier / Company','text','The Hartford',{span:2}),
+        f('underwriter','Underwriter','text','Olivia Hart',{span:2})
+      ]},
+      {title:'Applicant Information', fields:[
+        f('applicant_name','Applicant Name','text','Pinecrest Business Center LLC',{span:2}),
+        f('entity_type','Entity Type','select','LLC',{options:['','Individual','Corporation','LLC','Partnership','Other']}),
+        f('fein','FEIN','text','91-2087733',{compare:'digits'}),
+        f('mailing_address','Mailing Address','textarea','4100 Pinecrest Commons Road Charlotte NC 28211',{span:2,compare:'address'}),
+        f('applicant_phone','Applicant Phone','tel','704-555-0142',{compare:'phone'}),
+        f('applicant_email','Applicant Email','email','admin@pinecrestcenter.example'),
+        f('naics','NAICS','text','531120',{compare:'digits'}),
+        f('sic','SIC','text','6512',{compare:'digits'}),
+        f('business_type','Business / Occupancy','text','Office and retail lessor',{span:2,keywords:['office','retail','lessor'],min:2,expectedLabel:'Office and retail lessor'}),
+        f('operations_description','Description of Operations','textarea','',{span:4,keywords:['office','retail','lessor','coffee shop','fitness studio','accounting office','administrative office','no manufacturing','no overnight occupancy'],min:6,expectedLabel:'Office/retail lessor with listed tenants, no manufacturing, no overnight occupancy.'})
+      ]},
+      {title:'Policy / Premises Information', fields:[
+        f('effective_date','Proposed Effective Date','date','2026-08-01'),
+        f('expiration_date','Proposed Expiration Date','date','2027-08-01'),
+        f('billing_plan','Billing Plan','select','Direct Bill',{options:['','Agency Bill','Direct Bill']}),
+        f('payment_plan','Payment Plan','select','Quarterly',{options:['','Annual','Quarterly','Monthly']}),
+        f('loc_no','Location Number','text','1'),
+        f('bldg_no','Building Number','text','1'),
+        f('premises_address','Premises Address','textarea','4100 Pinecrest Commons Road Charlotte Mecklenburg County NC 28211',{span:2,compare:'address'}),
+        f('interest','Applicant Interest','select','Building Owner',{options:['','Building Owner','Tenant','Condo Association','Other']}),
+        f('construction','Construction Type','select','Joisted Masonry',{options:['','Frame','Joisted Masonry','Non-Combustible','Masonry Non-Combustible','Modified Fire Resistive','Fire Resistive']}),
+        f('stories','Number of Stories','text','2',{compare:'digits'}),
+        f('total_area','Total Area / Sq Ft','text','18500',{compare:'money'}),
+        f('year_built','Year Built','text','2008',{compare:'digits'}),
+        f('roof_update','Roof Updated','text','2021',{compare:'digits'}),
+        f('wiring_update','Wiring Updated','text','2018',{compare:'digits'}),
+        f('plumbing_update','Plumbing Updated','text','2019',{compare:'digits'}),
+        f('heating_update','Heating Updated','text','2019',{compare:'digits'}),
+        f('protection_class','Protection Class','text','04',{compare:'digits'}),
+        f('sprinkler','Sprinklered?','select','Yes',{options:['','Yes','No','Partial']}),
+        f('alarm','Alarm Type','select','Central Station',{options:['','None','Local','Central Station']}),
+        f('hydrant_distance','Hydrant Distance','text','500',{compare:'digits'}),
+        f('fire_station_distance','Fire Station Distance','text','2',{compare:'digits'})
+      ]},
+      {title:'Property Coverages Requested', fields:[
+        f('building_limit','Building Limit','text','3200000',{compare:'money'}),
+        f('bpp_limit','Business Personal Property Limit','text','150000',{compare:'money'}),
+        f('business_income','Business Income Limit','text','450000',{compare:'money'}),
+        f('ordinance_law','Ordinance or Law Limit','text','250000',{compare:'money'}),
+        f('equipment_breakdown','Equipment Breakdown','select','Yes',{options:['','Yes','No']}),
+        f('deductible','Deductible','text','2500',{compare:'money'}),
+        f('coinsurance','Coinsurance %','text','90',{compare:'digits'}),
+        f('valuation','Valuation','select','Replacement Cost',{options:['','Actual Cash Value','Replacement Cost','Functional Replacement Cost']}),
+        f('cause_loss','Causes of Loss','select','Special',{options:['','Basic','Broad','Special']}),
+        f('inflation_guard','Inflation Guard %','text','4',{compare:'digits'}),
+        f('mortgagee_name','Mortgagee Name','text','First Carolina Bank ISAOA',{span:2}),
+        f('mortgagee_address','Mortgagee Address','textarea','900 Trade Street Charlotte NC 28202',{span:2,compare:'address'}),
+        f('loan_number','Loan Number','text','FCB-778812',{compare:'code'})
+      ]},
+      {title:'Loss History / Underwriting Questions / Signature', fields:[
+        f('prior_carrier','Prior Carrier','text','Travelers'),
+        f('prior_policy','Prior Policy Number','text','CMP-6019982',{compare:'code'}),
+        f('loss_count','Loss Count','text','1',{compare:'digits'}),
+        f('loss_paid','Loss Paid','text','7800',{compare:'money'}),
+        f('loss_description','Loss Description','textarea','',{span:4,keywords:['2024','water damage','7800','pipe repaired','mitigation completed','no open reserves'],min:4,expectedLabel:'2024 water damage claim paid $7,800; pipe repaired, mitigation completed, no open reserves.'}),
+        f('vacant','Building Vacant?','select','No',{options:['','Yes','No']}),
+        f('cooking','Cooking Exposure?','select','Yes',{options:['','Yes','No']}),
+        f('flammable','Flammable Manufacturing?','select','No',{options:['','Yes','No']}),
+        f('burglar_alarm','Burglar Alarm?','select','Yes',{options:['','Yes','No']}),
+        f('flood_zone','In Flood Zone?','select','No',{options:['','Yes','No','Unknown']}),
+        f('historical','Historical Building?','select','No',{options:['','Yes','No']}),
+        f('safety_controls','Property Risk Controls / Notes','textarea','',{span:2,keywords:['central station','sprinkler','hydrant','fire station','coffee shop','permitted equipment'],min:4,expectedLabel:'Central station alarm, sprinkler, hydrant/fire station info, and permitted coffee shop equipment.'}),
+        f('applicant_signature','Applicant Signature','text','Laura Chen',{span:2}),
+        f('signature_title','Title','text','Managing Member'),
+        f('signature_date','Signature Date','date','2026-06-03')
+      ]}
+    ]
+  }
+};
+
+function f(id,label,type,expected,opts={}){ return {id,label,type,expected,required:true,...opts}; }
 function $(id){ return document.getElementById(id); }
-function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2300); }
-function escapeHtml(str){ return String(str ?? '').replace(/[&<>"']/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[s])); }
-function defaultProgress(){ return { auto:{attempts:0, passed:false, bestScore:0}, property:{attempts:0, passed:false, bestScore:0} }; }
-function getProgress(){ try { return Object.assign(defaultProgress(), JSON.parse(localStorage.getItem(STORAGE_KEY))||{}); } catch(e){ return defaultProgress(); } }
-function setProgress(p){ localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }
-function getDrafts(){ try { return JSON.parse(localStorage.getItem(DRAFT_KEY))||{}; } catch(e){ return {}; } }
-function setDrafts(d){ localStorage.setItem(DRAFT_KEY, JSON.stringify(d)); }
-function getLogs(){ try { return JSON.parse(localStorage.getItem(LOG_KEY))||[]; } catch(e){ return []; } }
-function setLogs(logs){ localStorage.setItem(LOG_KEY, JSON.stringify(logs)); }
-function getTrainee(){ try { return JSON.parse(localStorage.getItem(TRAINEE_KEY))||{}; } catch(e){ return {}; } }
-function saveTrainee(){ const data={name:$('traineeName').value.trim(), email:$('traineeEmail').value.trim()}; localStorage.setItem(TRAINEE_KEY, JSON.stringify(data)); toast('Trainee info saved.'); }
-function loadTrainee(){ const t=getTrainee(); $('traineeName').value=t.name||''; $('traineeEmail').value=t.email||''; }
-function isUnlocked(id){ if(id==='auto') return true; const p=getProgress(); return !!p.auto.passed; }
-function isBlocked(id){ const p=getProgress()[id]; return p.attempts >= MAX_ATTEMPTS && !p.passed; }
-function remaining(id){ const p=getProgress()[id]; return Math.max(0, MAX_ATTEMPTS - p.attempts); }
-
+function toast(message){ const t=$('toast'); t.textContent=message; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2400); }
+function escapeHtml(value){ return String(value ?? '').replace(/[&<>"']/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[s])); }
+function loadJSON(key, fallback){ try{return JSON.parse(localStorage.getItem(key)) ?? fallback}catch(e){return fallback} }
+function saveJSON(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+function allFields(s){ return s.sections.flatMap(sec=>sec.fields); }
+function getTrainee(){ return loadJSON(STORAGE.trainee,{name:'',email:''}); }
+function getDrafts(){ return loadJSON(STORAGE.drafts,{}); }
+function getLogs(){ return loadJSON(STORAGE.logs,[]); }
+function getProgress(){ return loadJSON(STORAGE.progress,{auto:{attempts:0,best:0,passed:false},property:{attempts:0,best:0,passed:false}}); }
+function setProgress(p){ saveJSON(STORAGE.progress,p); }
+function validTrainee(){
+  const name = $('traineeName').value.trim();
+  const email = $('traineeEmail').value.trim().toLowerCase();
+  const hasFullName = name.split(/\s+/).filter(Boolean).length >= 2;
+  const hasDomain = /^[^@\s]+@lavatraining\.com$/i.test(email);
+  return {ok:hasFullName && hasDomain, name, email, hasFullName, hasDomain};
+}
+function updateLoginStatus(){
+  const v = validTrainee();
+  const status = $('loginStatus');
+  if(v.ok){ status.className='statusline good'; status.textContent='VA access verified. You can now start a scenario.'; }
+  else if(!v.hasFullName && !v.hasDomain){ status.className='statusline warn'; status.textContent='Enter full name and @lavatraining.com email to unlock scenarios.'; }
+  else if(!v.hasFullName){ status.className='statusline bad'; status.textContent='Please enter the VA first and last name.'; }
+  else { status.className='statusline bad'; status.textContent='Email must end exactly with @lavatraining.com.'; }
+  renderDashboard();
+}
+function saveTrainee(){
+  const v = validTrainee();
+  if(!v.ok){ updateLoginStatus(); toast('Please use full name and @lavatraining.com email.'); return; }
+  saveJSON(STORAGE.trainee,{name:v.name,email:v.email});
+  updateLoginStatus(); toast('VA info saved.');
+}
+function clearTrainee(){
+  localStorage.removeItem(STORAGE.trainee); $('traineeName').value=''; $('traineeEmail').value=''; updateLoginStatus(); toast('VA info cleared.');
+}
 function renderDashboard(){
-  const p=getProgress();
-  $('dashboard').innerHTML = ['auto','property'].map(id=>{
-    const s=SCENARIOS[id]; const prog=p[id]; const unlocked=isUnlocked(id); const blocked=isBlocked(id);
-    const status = prog.passed ? 'Passed' : blocked ? 'Locked after 3 failed takes' : unlocked ? 'Unlocked' : 'Locked - pass Scenario 1 first';
-    const statusClass = prog.passed ? 'pass' : (!unlocked || blocked) ? 'lock' : 'open';
-    return `<article class="scenario-card glass ${(!unlocked||blocked)?'locked':''}">
-      <p class="eyebrow">${escapeHtml(s.tag)}</p><h2>${escapeHtml(s.title)}</h2><p>${escapeHtml(s.description)}</p>
-      <span class="status-pill ${statusClass}">${prog.passed?'✅':(!unlocked||blocked?'🔒':'🟡')} ${status}</span>
-      <div class="stats"><div class="stat"><strong>${prog.attempts}</strong><span>Takes used</span></div><div class="stat"><strong>${remaining(id)}</strong><span>Takes left</span></div><div class="stat"><strong>${prog.bestScore||0}%</strong><span>Best score</span></div><div class="stat"><strong>${prog.passed?'Yes':'No'}</strong><span>Passed</span></div></div>
-      <div class="btns"><button class="btn-primary" ${(unlocked && !blocked)?'':'disabled'} onclick="startScenario('${id}')">${prog.passed?'Review / Practice':'Start / Continue'}</button><button class="btn-secondary" onclick="viewScenarioSummary('${id}')">View Brief</button></div>
+  const access = validTrainee().ok;
+  const progress = getProgress();
+  $('dashboard').innerHTML = Object.values(scenarios).map(s=>{
+    const p = progress[s.id] || {attempts:0,best:0,passed:false};
+    const statusClass = p.passed ? 'pass' : p.attempts ? 'fail' : 'open';
+    const statusText = p.passed ? 'Passed' : p.attempts ? 'Needs Retake / Review' : 'Not Started';
+    return `<article class="scenario-card glass">
+      <span class="status-pill ${statusClass}">${statusText}</span>
+      <h2>${escapeHtml(s.title)}</h2>
+      <p>${escapeHtml(s.short)}</p>
+      <div class="card-stats">
+        <div class="stat"><strong>${s.timerMinutes}</strong><span>Minutes</span></div>
+        <div class="stat"><strong>${allFields(s).length}</strong><span>Graded Fields</span></div>
+        <div class="stat"><strong>${p.best || 0}%</strong><span>Best Score</span></div>
+      </div>
+      <div class="btns">
+        <button class="btn-primary" data-start="${s.id}" ${access?'':'disabled'}>${p.attempts ? 'Retake Scenario' : 'Start Scenario'}</button>
+        <button class="btn-secondary" data-preview="${s.id}">View Packet</button>
+      </div>
+      ${access ? '' : '<div class="hint">Locked until VA access is verified.</div>'}
     </article>`;
   }).join('');
+  document.querySelectorAll('[data-start]').forEach(btn=>btn.addEventListener('click',()=>startScenario(btn.dataset.start)));
+  document.querySelectorAll('[data-preview]').forEach(btn=>previewPacket(btn.dataset.preview));
+  renderLogs();
 }
-
-function viewScenarioSummary(id){
-  const s=SCENARIOS[id];
-  $('resultContent').innerHTML = `<h2>${escapeHtml(s.title)}</h2><p class="small">${escapeHtml(s.description)}</p><div class="scenario-packet">${s.packet}</div><div class="btns"><button class="btn-secondary" onclick="closeModal()">Close</button></div>`;
+function previewPacket(id){
+  const s=scenarios[id];
+  $('resultContent').innerHTML = `<h2 style="text-align:center;margin-top:0">${escapeHtml(s.title)}</h2><div class="miss-list"><div class="miss">${s.packet}</div></div>`;
   $('resultModal').style.display='flex';
 }
+let activeScenario = null;
+let timerHandle = null;
+let endAt = null;
+let startedAt = null;
+let submitted = false;
 
-function renderFields(){
-  for(const page of [1,2,3,4]){
-    const el=$('page'+page);
-    // remove old overlays
-    [...el.querySelectorAll('.field-overlay')].forEach(x=>x.remove());
-  }
-  FIELDS.forEach(f=>{
-    const wrap=document.createElement('div');
-    wrap.className='field-overlay' + (f.critical?' critical':'');
-    wrap.dataset.label=f.label;
-    wrap.style.left=(f.x/1020*100)+'%'; wrap.style.top=(f.y/1320*100)+'%'; wrap.style.width=(f.w/1020*100)+'%'; wrap.style.height=(f.h/1320*100)+'%';
-    let node;
-    if(f.type==='textarea'){
-      node=document.createElement('textarea');
-    } else if(f.type==='select'){
-      node=document.createElement('select');
-      (f.options||['','Yes','No']).forEach(o=>{ const opt=document.createElement('option'); opt.value=o; opt.textContent=o; node.appendChild(opt); });
-    } else {
-      node=document.createElement('input'); node.type='text';
-    }
-    node.id='fld_'+f.id; node.name=f.id; node.placeholder=f.placeholder || '';
-    node.addEventListener('input',()=>{ updateCompletion(); autoSaveDraftSoon(); wrap.classList.remove('is-error'); });
-    node.addEventListener('change',()=>{ updateCompletion(); autoSaveDraftSoon(); wrap.classList.remove('is-error'); });
-    wrap.appendChild(node);
-    $('page'+f.page).appendChild(wrap);
-  });
+function draftKey(id){
+  const email = validTrainee().email || getTrainee().email || 'unknown';
+  return `${email}_${id}`;
 }
-
-let autoTimer=null;
-function autoSaveDraftSoon(){ clearTimeout(autoTimer); autoTimer=setTimeout(()=>saveDraft(false),600); }
-function getValues(){ const v={}; FIELDS.forEach(f=>{ const node=$('fld_'+f.id); v[f.id]=node ? node.value.trim() : ''; }); return v; }
-function setValues(v){ FIELDS.forEach(f=>{ const node=$('fld_'+f.id); if(node) node.value = v && v[f.id] ? v[f.id] : ''; }); updateCompletion(); }
-function saveDraft(show=true){ if(!activeScenario) return; const drafts=getDrafts(); drafts[activeScenario]=getValues(); setDrafts(drafts); if(show) toast('Draft saved.'); }
-function loadDraft(id){ const drafts=getDrafts(); setValues(drafts[id]||{}); }
-function clearDraftConfirm(){ if(!activeScenario) return; if(confirm('Clear all fields for this scenario draft?')){ const drafts=getDrafts(); delete drafts[activeScenario]; setDrafts(drafts); setValues({}); toast('Draft cleared.'); } }
-function clearErrors(){ document.querySelectorAll('.field-overlay.is-error').forEach(x=>x.classList.remove('is-error')); }
-
 function startScenario(id){
-  if(!isUnlocked(id)){ toast('Scenario 2 is locked until Scenario 1 is passed.'); return; }
-  if(isBlocked(id)){ toast('This scenario is locked after 3 failed takes. Ask trainer to reset.'); return; }
-  activeScenario=id; activePage=1;
-  $('workbench').style.display='grid';
-  $('scenarioPacket').innerHTML=SCENARIOS[id].packet;
-  $('formTitle').textContent=SCENARIOS[id].title;
-  const prog=getProgress()[id];
-  $('formMeta').textContent=`Takes used: ${prog.attempts}/${MAX_ATTEMPTS} • Best score: ${prog.bestScore||0}% • Passing: ${PASSING_SCORE}%`;
-  renderTabs(); showPage(1); loadDraft(id); clearErrors(); $('workbench').scrollIntoView({behavior:'smooth',block:'start'});
+  const access = validTrainee();
+  if(!access.ok){ toast('Complete VA access first.'); updateLoginStatus(); return; }
+  saveJSON(STORAGE.trainee,{name:access.name,email:access.email});
+  activeScenario = scenarios[id];
+  submitted = false;
+  startedAt = Date.now();
+  endAt = Date.now() + activeScenario.timerMinutes * 60 * 1000;
+  $('dashboard').style.display='none';
+  $('trainerPanel').style.display='none';
+  $('workspace').style.display='grid';
+  $('sideTitle').textContent = activeScenario.title;
+  $('sideDesc').textContent = activeScenario.short;
+  $('packetContent').innerHTML = activeScenario.packet;
+  $('crumb').textContent = `${activeScenario.formNo} • ${activeScenario.scenarioName}`;
+  $('answerKeyBox').innerHTML=''; $('trainerCode').value='';
+  renderForm(activeScenario);
+  loadDraft(id);
+  updateCompletion();
+  startTimer();
+  toast('Scenario started. Timer is running.');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
-function renderTabs(){ $('pageTabs').innerHTML=[1,2,3,4].map(p=>`<button class="tab ${p===activePage?'active':''}" onclick="showPage(${p})">${PAGE_TITLES[p]}</button>`).join(''); }
-function showPage(page){ activePage=page; for(const p of [1,2,3,4]) $('page'+p).classList.toggle('active', p===page); renderTabs(); }
-function setZoom(delta){ zoom=Math.min(1.3,Math.max(.55,zoom+delta)); document.querySelectorAll('.page').forEach(p=>p.style.transform=`scale(${zoom})`); $('zoomText').textContent=Math.round(zoom*100)+'%'; const frame=$('pageFrame'); frame.style.minHeight = (1320*zoom+34)+'px'; }
-function printCurrentPage(){ window.print(); }
-function updateCompletion(){ const vals=getValues(); let filled=0, total=0; FIELDS.forEach(f=>{ if(f.optionalWhenEmpty) return; total++; if((vals[f.id]||'').trim()) filled++; }); const pct=total ? Math.round(filled/total*100) : 0; $('completionBar').style.width=pct+'%'; $('completionText').textContent=`${pct}% completed • ${filled}/${total} required fields filled`; }
-
-function normalize(v){ return String(v ?? '').toLowerCase().trim().replace(/\s+/g,' ').replace(/[,$]/g,'').replace(/[()]/g,'').replace(/[\u2010-\u2015]/g,'-'); }
-function digits(v){ return String(v ?? '').replace(/\D/g,''); }
-function looksLikePhoneOrId(str){ const d=digits(str); return d.length>=7 && d.length<=12; }
-function compareValue(actual, expected, field){
-  const a=String(actual ?? '').trim();
-  if(field && field.optionalWhenEmpty && (expected==='' || expected==null || (typeof expected==='object' && (expected.min||0)===0)) && a==='') return {skip:true, ok:true};
-  if(typeof expected==='object' && expected && Array.isArray(expected.keywords)){
-    const lower=normalize(a); let hits=0; const missing=[];
-    expected.keywords.forEach(k=>{ if(lower.includes(normalize(k))) hits++; else missing.push(k); });
-    const min = expected.min ?? expected.keywords.length;
-    return {ok:hits>=min, expected:`include at least ${min}: ${expected.keywords.join(', ')}`, actual:a || '(blank)', missing};
+function renderForm(s){
+  const form = $('simForm');
+  form.innerHTML = `<div class="form-head">
+    <div class="form-mark">ACORD</div>
+    <div class="form-title-box"><h2>${escapeHtml(s.title)}</h2><p>${escapeHtml(s.formNo)} • LAVA Training Simulator</p></div>
+    <div class="form-meta"><div>DATE: __________</div><div>PAGE 1 OF 1</div><div>TRAINING ONLY</div></div>
+  </div>
+  <div class="notice"><b>Important:</b> This simulator uses ACORD-style organization to train accuracy and attention to detail. It is not an official ACORD filing form. Complete fields from the scenario packet only.</div>
+  ${s.sections.map(sec=>`<section class="section">
+    <div class="section-title"><span>${escapeHtml(sec.title)}</span><span>${sec.note?escapeHtml(sec.note):'Required fields are graded'}</span></div>
+    <div class="fields">${sec.fields.map(renderField).join('')}</div>
+    ${sec.note?`<div class="mini-note">${escapeHtml(sec.note)}</div>`:''}
+  </section>`).join('')}`;
+  form.querySelectorAll('input,select,textarea').forEach(el=>{
+    el.addEventListener('input',()=>{ updateCompletion(); saveDraft(false); });
+    el.addEventListener('change',()=>{ updateCompletion(); saveDraft(false); });
+  });
+}
+function renderField(field){
+  const span = field.span ? ` span-${field.span}` : '';
+  const compact = field.type !== 'textarea' ? ' compact' : '';
+  const required = field.required ? '<span class="required">*</span>' : '';
+  let control = '';
+  if(field.type === 'select'){
+    control = `<select id="${field.id}" name="${field.id}">${(field.options||['','Yes','No']).map(opt=>`<option value="${escapeHtml(opt)}">${escapeHtml(opt || 'Select')}</option>`).join('')}</select>`;
+  } else if(field.type === 'textarea'){
+    control = `<textarea id="${field.id}" name="${field.id}" placeholder="Type answer from scenario packet"></textarea>`;
+  } else {
+    control = `<input id="${field.id}" name="${field.id}" type="${field.type || 'text'}" placeholder="Type here" />`;
   }
-  const e=String(expected ?? '').trim();
-  if(field && field.optionalWhenEmpty && e==='' && a==='') return {skip:true, ok:true};
-  if(looksLikePhoneOrId(e) && digits(a)===digits(e)) return {ok:true};
-  const an=normalize(a), en=normalize(e);
-  if(an===en) return {ok:true};
-  // For numbers, allow commas and dollar signs.
-  if(digits(e) && digits(a) && digits(e)===digits(a)) return {ok:true};
-  return {ok:false, expected:e || '(blank)', actual:a || '(blank)'};
+  const hint = field.expectedLabel ? `<small>Graded by keywords.</small>` : '';
+  return `<div class="field${span}${compact}" data-field-wrap="${field.id}"><label for="${field.id}">${escapeHtml(field.label)}${required}</label>${control}${hint}</div>`;
 }
-function gradeActiveScenario(){
-  if(!activeScenario) return toast('Select a scenario first.');
-  if(isBlocked(activeScenario)) return toast('This scenario is locked after 3 failed takes.');
-  saveDraft(false); clearErrors();
-  const s=SCENARIOS[activeScenario]; const vals=getValues();
-  let total=0, earned=0, misses=[];
-  FIELDS.forEach(f=>{
-    const expected=s.expected[f.id];
-    if(typeof expected==='undefined') return;
-    const weight=f.critical ? 2 : 1;
-    const res=compareValue(vals[f.id], expected, f);
-    if(res.skip) return;
-    total += weight;
-    if(res.ok) earned += weight;
+function collectValues(){
+  const values = {};
+  if(!activeScenario) return values;
+  allFields(activeScenario).forEach(field=>{
+    const el = document.querySelector(`[name="${CSS.escape(field.id)}"]`);
+    values[field.id] = el ? el.value.trim() : '';
+  });
+  return values;
+}
+function saveDraft(show=true){
+  if(!activeScenario) return;
+  const drafts = getDrafts();
+  drafts[draftKey(activeScenario.id)] = collectValues();
+  saveJSON(STORAGE.drafts,drafts);
+  if(show) toast('Draft saved locally.');
+}
+function loadDraft(id){
+  const drafts = getDrafts();
+  const data = drafts[draftKey(id)] || {};
+  Object.entries(data).forEach(([key,value])=>{
+    const el = document.querySelector(`[name="${CSS.escape(key)}"]`);
+    if(el) el.value = value;
+  });
+}
+function resetDraft(){
+  if(!activeScenario) return;
+  if(!confirm('Reset this scenario draft? This clears all fields for the active scenario only.')) return;
+  const drafts = getDrafts(); delete drafts[draftKey(activeScenario.id)]; saveJSON(STORAGE.drafts,drafts);
+  renderForm(activeScenario); updateCompletion(); toast('Draft reset.');
+}
+function updateCompletion(){
+  if(!activeScenario) return;
+  const fields = allFields(activeScenario);
+  const values = collectValues();
+  const completed = fields.filter(f=>String(values[f.id]||'').trim()).length;
+  $('completionBar').style.width = `${Math.round((completed / fields.length) * 100)}%`;
+  $('fieldProgress').textContent = `${completed} of ${fields.length} fields completed`;
+}
+function startTimer(){
+  clearInterval(timerHandle);
+  updateTimer();
+  timerHandle = setInterval(updateTimer,1000);
+}
+function updateTimer(){
+  const left = Math.max(0, endAt - Date.now());
+  const total = activeScenario ? activeScenario.timerMinutes*60*1000 : 1;
+  const mins = Math.floor(left/60000);
+  const secs = Math.floor((left%60000)/1000);
+  const timer = $('timer');
+  timer.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+  timer.classList.toggle('warn', left <= 10*60*1000 && left > 5*60*1000);
+  timer.classList.toggle('danger', left <= 5*60*1000);
+  if(left <= 0 && activeScenario && !submitted){
+    clearInterval(timerHandle);
+    toast('Time is up. Submitting automatically.');
+    gradeScenario(true);
+  }
+}
+function normalize(value, mode){
+  let v = String(value ?? '').trim().toLowerCase();
+  if(mode === 'phone' || mode === 'digits' || mode === 'money') return v.replace(/[^0-9]/g,'').replace(/^0+(?=\d)/,'');
+  if(mode === 'vin' || mode === 'code') return v.replace(/[^a-z0-9]/gi,'').toUpperCase();
+  if(mode === 'address') return v.replace(/[.,#]/g,'').replace(/\s+/g,' ').trim();
+  return v.replace(/[.,]/g,'').replace(/\s+/g,' ').trim();
+}
+function fieldCorrect(field, actual){
+  if(!String(actual||'').trim()) return false;
+  if(field.keywords){
+    const text = normalize(actual,'text');
+    const hits = field.keywords.filter(k=>text.includes(normalize(k,'text'))).length;
+    return hits >= (field.min || field.keywords.length);
+  }
+  if(field.accepted){
+    return field.accepted.some(ans=>normalize(actual,field.compare) === normalize(ans,field.compare));
+  }
+  return normalize(actual,field.compare) === normalize(field.expected,field.compare);
+}
+function expectedText(field){
+  if(field.expectedLabel) return field.expectedLabel;
+  if(field.accepted) return field.accepted[0];
+  return field.expected;
+}
+function gradeScenario(auto=false){
+  if(!activeScenario || submitted) return;
+  submitted = true;
+  clearInterval(timerHandle);
+  saveDraft(false);
+  const values = collectValues();
+  const fields = allFields(activeScenario);
+  let correct = 0;
+  const misses = [];
+  fields.forEach(field=>{
+    const wrap = document.querySelector(`[data-field-wrap="${CSS.escape(field.id)}"]`);
+    if(wrap) wrap.classList.remove('error','correct');
+    const ok = fieldCorrect(field, values[field.id]);
+    if(ok){ correct++; if(wrap) wrap.classList.add('correct'); }
     else {
-      misses.push({id:f.id,label:f.label,critical:!!f.critical,expected:res.expected,actual:res.actual});
-      const node=$('fld_'+f.id); if(node) node.closest('.field-overlay').classList.add('is-error');
+      if(wrap) wrap.classList.add('error');
+      misses.push({label:field.label, expected:expectedText(field), actual:values[field.id] || 'Blank'});
     }
   });
-  const score=Math.round((earned/total)*100);
-  const passed=score>=PASSING_SCORE;
-  const p=getProgress();
-  if(!p[activeScenario].passed) p[activeScenario].attempts += 1;
-  p[activeScenario].bestScore=Math.max(p[activeScenario].bestScore||0,score);
-  if(passed) p[activeScenario].passed=true;
-  setProgress(p);
-  const trainee=getTrainee();
-  const log={date:new Date().toLocaleString(), name:trainee.name||'', email:trainee.email||'', scenario:SCENARIOS[activeScenario].title, score, passed, attemptsUsed:p[activeScenario].attempts, misses:misses.length};
-  const logs=getLogs(); logs.push(log); setLogs(logs);
-  renderDashboard();
-  if(misses.length){
-    const firstError = document.querySelector('.field-overlay.is-error');
-    if(firstError){
-      const page = firstError.closest('.page');
-      if(page && page.id){ showPage(Number(page.id.replace('page','')) || activePage); }
-      setTimeout(()=>firstError.scrollIntoView({behavior:'smooth', block:'center', inline:'center'}), 120);
-    }
-  }
-  showResult(score, passed, misses, p[activeScenario]);
+  const score = Math.round((correct / fields.length) * 100);
+  const passed = score >= PASSING_SCORE;
+  const timeUsedMs = Date.now() - startedAt;
+  const log = {
+    date:new Date().toLocaleString(),
+    trainee:validTrainee().name,
+    email:validTrainee().email,
+    scenario:activeScenario.title,
+    scenarioId:activeScenario.id,
+    score,
+    passed,
+    correct,
+    total:fields.length,
+    timeUsed:formatDuration(timeUsedMs),
+    autoSubmitted:auto,
+    missed:misses.length
+  };
+  const logs = getLogs(); logs.unshift(log); saveJSON(STORAGE.logs,logs.slice(0,200));
+  const progress = getProgress();
+  progress[activeScenario.id] = progress[activeScenario.id] || {attempts:0,best:0,passed:false};
+  progress[activeScenario.id].attempts += 1;
+  progress[activeScenario.id].best = Math.max(progress[activeScenario.id].best || 0, score);
+  progress[activeScenario.id].passed = progress[activeScenario.id].passed || passed;
+  setProgress(progress);
+  showResults(score, passed, correct, fields.length, misses, auto, log.timeUsed);
+  renderLogs();
 }
-function showResult(score, passed, misses, prog){
-  const locked = prog.attempts>=MAX_ATTEMPTS && !prog.passed;
-  const topMisses = misses.slice(0,30).map(m=>`<div class="miss"><strong>${m.critical?'Critical: ':''}${escapeHtml(m.label)}</strong><br><span class="small">Expected: ${escapeHtml(m.expected)}<br>Your entry: ${escapeHtml(m.actual)}</span></div>`).join('') || '<div class="miss"><strong>No missed fields detected.</strong></div>';
-  $('resultContent').innerHTML = `<div class="score" style="border-color:${passed?'rgba(57,229,139,.7)':'rgba(255,77,109,.7)'}">${score}%</div>
-    <h2 style="text-align:center;margin:0 0 8px">${passed?'Passed ✅':'Not Passed Yet'}</h2>
-    <p class="small" style="text-align:center">Passing score: ${PASSING_SCORE}%. Takes used: ${prog.attempts}/${MAX_ATTEMPTS}. ${passed && activeScenario==='auto'?'Scenario 2 is now unlocked.':''} ${locked?'This scenario is now locked. Trainer reset is required.':''}</p>
-    <div class="miss-list">${topMisses}</div>
-    <div class="btns"><button class="btn-primary" onclick="closeModal()">Continue Reviewing</button>${!passed && !locked?'<button class="btn-secondary" onclick="closeModal()">Try Again</button>':''}</div>`;
+function showResults(score, passed, correct, total, misses, auto, timeUsed){
+  $('resultContent').innerHTML = `<div class="score-circle" style="color:${passed?'#bbf7d0':'#fecdd3'}">${score}%</div>
+    <h2 style="text-align:center;margin:0 0 8px">${passed ? 'Passed' : 'Needs Review'}</h2>
+    <p style="text-align:center;color:#d9e0f1;line-height:1.5;margin:0 0 12px">${correct} of ${total} fields correct • Passing score: ${PASSING_SCORE}% • Time used: ${escapeHtml(timeUsed)}${auto?' • Auto-submitted when timer ended':''}</p>
+    <h3 style="margin:18px 0 8px">Missed Fields (${misses.length})</h3>
+    <div class="miss-list">${misses.length ? misses.slice(0,80).map(m=>`<div class="miss"><strong>${escapeHtml(m.label)}</strong><br><em>Your answer:</em> ${escapeHtml(m.actual)}<br><em>Expected:</em> ${escapeHtml(m.expected)}</div>`).join('') : '<div class="miss">Excellent work. No missed fields.</div>'}</div>`;
   $('resultModal').style.display='flex';
+}
+function formatDuration(ms){
+  const sec = Math.max(0,Math.round(ms/1000));
+  const m = Math.floor(sec/60); const s = sec%60;
+  return `${m}m ${String(s).padStart(2,'0')}s`;
+}
+function backDashboard(){
+  clearInterval(timerHandle);
+  if(activeScenario && !submitted) saveDraft(false);
+  activeScenario=null; submitted=false;
+  $('workspace').style.display='none';
+  $('dashboard').style.display='grid';
+  $('trainerPanel').style.display='block';
+  renderDashboard();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function showAnswerKey(){
+  if(!activeScenario) return;
+  if($('trainerCode').value.trim() !== TRAINER_CODE){ toast('Invalid trainer code.'); return; }
+  const html = allFields(activeScenario).map(field=>`<div style="margin:8px 0"><b>${escapeHtml(field.label)}:</b> ${escapeHtml(expectedText(field))}</div>`).join('');
+  $('answerKeyBox').innerHTML = html;
+}
+function renderLogs(){
+  const logs = getLogs();
+  $('trainerPanel').style.display = logs.length ? 'block' : 'none';
+  $('logsBody').innerHTML = logs.map(l=>`<tr><td>${escapeHtml(l.date)}</td><td>${escapeHtml(l.trainee)}</td><td>${escapeHtml(l.email)}</td><td>${escapeHtml(l.scenario)}</td><td>${l.score}%</td><td>${l.passed?'Passed':'Needs Review'}</td><td>${escapeHtml(l.timeUsed)}</td><td>${l.missed}</td></tr>`).join('');
+}
+function exportCSV(){
+  const logs=getLogs();
+  if(!logs.length){ toast('No logs to export.'); return; }
+  const rows=[['Date','VA','Email','Scenario','Score','Status','Correct','Total','Time Used','Auto Submitted','Missed']];
+  logs.forEach(l=>rows.push([l.date,l.trainee,l.email,l.scenario,l.score,l.passed?'Passed':'Needs Review',l.correct,l.total,l.timeUsed,l.autoSubmitted?'Yes':'No',l.missed]));
+  const csv = rows.map(r=>r.map(cell=>`"${String(cell??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='lava-commercial-acord-results.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+function clearLogs(){
+  if(!confirm('Clear all local result logs and progress?')) return;
+  localStorage.removeItem(STORAGE.logs); localStorage.removeItem(STORAGE.progress); renderDashboard(); toast('Logs and progress cleared.');
 }
 function closeModal(){ $('resultModal').style.display='none'; }
-$('resultModal').addEventListener('click',e=>{ if(e.target.id==='resultModal') closeModal(); });
-
-function unlockTrainerTools(){ if($('trainerCode').value.trim()===TRAINER_CODE){ $('trainerTools').classList.remove('hidden'); toast('Trainer tools unlocked.'); } else toast('Incorrect trainer code.'); }
-function showAnswerKey(){ if(!activeScenario) return toast('Start a scenario first.'); const data=SCENARIOS[activeScenario].expected; const rows=FIELDS.map(f=>{ const v=data[f.id]; if(typeof v==='undefined') return ''; const text=typeof v==='object' && v.keywords ? 'Include: '+v.keywords.join('; ') : v; return `<tr><td>${escapeHtml(f.label)}</td><td>${escapeHtml(text)}</td></tr>`; }).join(''); $('resultContent').innerHTML=`<h2>Answer Key - ${escapeHtml(SCENARIOS[activeScenario].title)}</h2><div style="max-height:60vh;overflow:auto"><table style="width:100%;border-collapse:collapse;color:#fff"><tbody>${rows}</tbody></table></div><style>td{border-bottom:1px solid rgba(255,255,255,.13);padding:8px;vertical-align:top}</style><div class="btns" style="margin-top:12px"><button class="btn-secondary" onclick="closeModal()">Close</button></div>`; $('resultModal').style.display='flex'; }
-function resetAllProgress(){ if(confirm('Reset all attempts, passes, drafts, and logs?')){ localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(LOG_KEY); renderDashboard(); if(activeScenario) setValues({}); toast('All progress reset.'); } }
-function markScenarioOnePassed(){ const p=getProgress(); p.auto.passed=true; p.auto.bestScore=Math.max(p.auto.bestScore||0,90); setProgress(p); renderDashboard(); toast('Scenario 2 unlocked by trainer.'); }
-function exportLogs(){ const logs=getLogs(); if(!logs.length) return toast('No result logs yet.'); const header=['Date','Name','Email','Scenario','Score','Passed','Attempts Used','Misses']; const lines=[header.join(',')].concat(logs.map(r=>header.map(h=>`"${String(r[h.charAt(0).toLowerCase()+h.slice(1).replace(/ /g,'')] ?? r[h] ?? '').replace(/"/g,'""')}"`).join(','))); // fallback below
-  const fixed=[header.join(',')].concat(logs.map(r=>[r.date,r.name,r.email,r.scenario,r.score,r.passed,r.attemptsUsed,r.misses].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')));
-  const blob=new Blob([fixed.join('\n')],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='acord130-simulator-results.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
-
-function init(){ loadTrainee(); renderFields(); renderDashboard(); renderTabs(); setZoom(0); }
+function init(){
+  const t=getTrainee(); $('traineeName').value=t.name||''; $('traineeEmail').value=t.email||'';
+  $('saveTraineeBtn').addEventListener('click',saveTrainee);
+  $('clearTraineeBtn').addEventListener('click',clearTrainee);
+  $('traineeName').addEventListener('input',updateLoginStatus);
+  $('traineeEmail').addEventListener('input',updateLoginStatus);
+  $('backBtn').addEventListener('click',backDashboard);
+  $('resetDraftBtn').addEventListener('click',resetDraft);
+  $('saveDraftBtn').addEventListener('click',()=>saveDraft(true));
+  $('printBtn').addEventListener('click',()=>window.print());
+  $('submitBtn').addEventListener('click',()=>gradeScenario(false));
+  $('showKeyBtn').addEventListener('click',showAnswerKey);
+  $('closeResultBtn').addEventListener('click',closeModal);
+  $('modalDashboardBtn').addEventListener('click',()=>{ closeModal(); backDashboard(); });
+  $('exportCsvBtn').addEventListener('click',exportCSV);
+  $('clearLogsBtn').addEventListener('click',clearLogs);
+  updateLoginStatus();
+  renderDashboard();
+}
 init();
 </script>
 </body>

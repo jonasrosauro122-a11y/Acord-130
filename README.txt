@@ -1,19 +1,29 @@
-ACORD 130 Actual Form Simulator - LAVA Training
+LAVA Commercial ACORD Form Simulator
+
+Files:
+- index.html: complete standalone simulator
+- netlify.toml: optional Netlify config
 
 How to use:
-1. Open index.html in a browser.
-2. Enter the VA name and email.
-3. Start Scenario 1 and fill out the blue fields directly on top of the actual uploaded ACORD 130 form image.
-4. Submit for grading. Scenario 2 unlocks only when Scenario 1 is passed.
-5. Each scenario allows 3 graded takes. Passing score is 90%.
+1. Upload the whole folder to GitHub.
+2. Deploy to Netlify with publish directory set to the project root.
+3. Open index.html in browser or the Netlify URL.
 
-Trainer tools:
-- Trainer code: LAVA2026
-- Export Results CSV saves local browser result logs.
+Built-in VA access rule:
+- Full name must include at least first and last name.
+- Email must end exactly with @lavatraining.com.
 
-Netlify setup:
-- Upload this folder or connect it to GitHub.
-- Build command: leave blank.
-- Publish directory: / or the folder containing index.html.
+Included scenarios:
+- Commercial Auto ACORD-style training packet
+- Commercial Property ACORD-style training packet
 
-This is for training only and does not submit real insurance applications.
+Built-in training tools:
+- 50-minute timer per scenario
+- Auto-submit when timer ends
+- 90% passing score
+- Local result logs
+- CSV export
+- Trainer answer key code: LAVA2026
+
+Note:
+This is a training simulator only. It uses ACORD-style organization but is not an official ACORD form or a filed carrier application.

@@ -1,12 +1,19 @@
-ACORD 130 Actual Form Simulator - Precision Overlay Fixed Version
+ACORD 130 Actual Form Simulator - LAVA Training
 
-Open index.html directly or deploy this folder to Netlify as a static site.
+How to use:
+1. Open index.html in a browser.
+2. Enter the VA name and email.
+3. Start Scenario 1 and fill out the blue fields directly on top of the actual uploaded ACORD 130 form image.
+4. Submit for grading. Scenario 2 unlocks only when Scenario 1 is passed.
+5. Each scenario allows 3 graded takes. Passing score is 90%.
 
-Fixes included:
-- Red/blue overlays tightened inside actual ACORD 130 fill areas.
-- Checkbox-style fields now use small clickable markers on actual checkbox locations instead of large dropdowns that overlap text.
-- Long YES-response explanation inputs moved to a sidebar worksheet so ACORD wording stays clean.
-- Corrected Scenario 1 audit option to At Expiration so grading matches ACORD 130 options.
-- Preserved grading, 2 scenarios, 3 attempts per scenario, Scenario 2 lock, trainer code, autosave, print, and CSV export.
+Trainer tools:
+- Trainer code: LAVA2026
+- Export Results CSV saves local browser result logs.
 
-Trainer code: LAVA2026
+Netlify setup:
+- Upload this folder or connect it to GitHub.
+- Build command: leave blank.
+- Publish directory: / or the folder containing index.html.
+
+This is for training only and does not submit real insurance applications.
